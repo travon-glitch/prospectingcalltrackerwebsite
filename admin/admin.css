@@ -210,3 +210,13 @@ dialog::backdrop { background: rgba(11, 27, 51, 0.55); }
 .login-card .banner { display: block; }
 .login-card .banner ul { margin: 6px 0 8px; padding-left: 20px; }
 .login-card .banner p + p { margin-top: 4px; }
+
+/* connection check / problem screen */
+.login-card.wide { max-width: 620px; }
+.login-card .row { margin-top: 16px; }
+.checks { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.checks li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; align-items: start; }
+.checks li p { margin: 2px 0 0; }
+.check-mark { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-weight: 800; color: #fff; background: var(--green); }
+.checks li.bad .check-mark { background: var(--red); }
+.version { margin: 16px 0 0; font-size: 0.75rem; color: var(--muted); text-align: center; }

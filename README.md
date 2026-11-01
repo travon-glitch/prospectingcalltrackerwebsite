@@ -11,14 +11,17 @@ the built-in editor (`/admin`) and the optional Directus back office (`cms/`). I
    (build command `node build.mjs`, output folder `dist`). Click **Deploy**.
 3. **Settings → Domains** → add `prospectingcalltracker.com` and `www.prospectingcalltracker.com`, then follow Vercel's DNS
    steps at your domain registrar.
-4. To turn on the editor at `/admin`, add `ADMIN_PASSWORD` and `GITHUB_TOKEN` (section 0 below) and redeploy.
-5. Optional, later: connect Directus for team logins and a full back office — see `cms/README.md`.
+4. Turn on the editor at `/admin`. **Recommended: Supabase** (email logins for each person, password reset,
+   content and photos in a database) — follow `supabase/README.md`. Alternative without Supabase: `ADMIN_PASSWORD` +
+   `GITHUB_TOKEN` (section 0 below).
+5. Optional: Directus as a full back office instead — see `cms/README.md`.
 
 ```
 (repository root)
   content/site.json     ← ALL the words, prices, links, contact details and settings (edited by /admin).
   admin/                ← the website editor (opens at /admin)
   api/admin.js          ← the editor's server part (login, publish, uploads) — runs on Vercel
+  supabase/             ← Supabase setup for the editor: setup.sql + step-by-step README (recommended)
   cms/                  ← optional Directus back office: setup script, server files, instructions (cms/README.md)
   assets/uploads/       ← photos uploaded in the editor
   assets/               ← styles.css, site.js (menu, forms, analytics), images, placeholders

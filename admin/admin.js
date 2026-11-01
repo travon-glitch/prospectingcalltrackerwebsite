@@ -171,25 +171,197 @@
 
   /* ================================================================ server */
 
-  function api(action, opts) {
-    opts = opts || {};
+  function apiCall(action, opts, token) {
     var init = { method: opts.body !== undefined ? "POST" : "GET", credentials: "same-origin", headers: {} };
+    if (token) init.headers.Authorization = "Bearer " + token;
     if (opts.body !== undefined) {
       init.headers["Content-Type"] = "application/json";
       init.headers["X-PCT-Admin"] = "1";
       init.body = JSON.stringify(opts.body);
     }
-    return fetch("/api/admin?action=" + action + (opts.query || ""), init).then(function (res) {
-      return res.json().catch(function () { return {}; }).then(function (data) {
-        if (!res.ok) {
-          var err = new Error(data.error || (res.status === 404 ? "The editor's server part isn't available here. It runs on Vercel (see README)." : "Request failed (" + res.status + ")"));
+    return fetch("/api/admin?action=" + action + (opts.query || ""), init).catch(function () {
+      throw new Error("Couldn't reach the website. Check your internet connection and try again.");
+    }).then(function (res) {
+      return res.json().catch(function () { return null; }).then(function (data) {
+        if (!res.ok || !data) {
+          var err = new Error((data && data.error) || serverProblem(res));
           err.status = res.status;
-          if (res.status === 401 && action !== "login") showLogin("Your session has ended. Please log in again — your unpublished changes are kept.");
           throw err;
         }
         return data;
       });
     });
+  }
+
+  function api(action, opts) {
+    opts = opts || {};
+    var ended = "Your session has ended. Please log in again — your unpublished changes are kept.";
+    if (!S.sb) {
+      return apiCall(action, opts, null).catch(function (err) {
+        if (err.status === 401 && action !== "login") showLogin(ended);
+        throw err;
+      });
+    }
+    // Supabase mode: send the login token; if it has just expired, renew it once and retry.
+    return sbToken().then(function (t) {
+      if (!t && action !== "session") { showSbLogin(ended); throw Object.assign(new Error(ended), { status: 401 }); }
+      return apiCall(action, opts, t).catch(function (err) {
+        if (err.status !== 401 || action === "session") throw err;
+        return sbRefresh().then(function (t2) {
+          if (!t2) throw err;
+          return apiCall(action, opts, t2);
+        }).catch(function (e2) {
+          if (e2.status === 401 || e2 === err) showSbLogin(ended);
+          throw e2;
+        });
+      });
+    });
+  }
+
+  /* ================================================================ Supabase login */
+
+  var AUTH_KEY = "pct-admin-auth";
+  function sbStore(v) {
+    try {
+      if (v === undefined) return JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
+      if (v === null) localStorage.removeItem(AUTH_KEY);
+      else localStorage.setItem(AUTH_KEY, JSON.stringify(v));
+    } catch (e) { return null; }
+    return v;
+  }
+  function sbSave(d) {
+    var saved = { access_token: d.access_token, refresh_token: d.refresh_token, expires_at: d.expires_at || Math.floor(Date.now() / 1000) + Number(d.expires_in || 3600), email: (d.user && d.user.email) || d.email || (sbStore() || {}).email || "" };
+    sbStore(saved);
+    return saved;
+  }
+  function friendlyAuth(msg) {
+    msg = String(msg || "");
+    if (/invalid login credentials|invalid grant/i.test(msg)) return "That email or password isn't right.";
+    if (/email not confirmed/i.test(msg)) return "Please confirm your email address first — check your inbox for the confirmation link.";
+    if (/rate limit|too many/i.test(msg)) return "Too many tries. Please wait a few minutes and try again.";
+    if (/password should be|weak password|at least/i.test(msg)) return "Please choose a longer password (at least 8 characters, ideally 12+).";
+    if (/expired|invalid.*(otp|link|token)/i.test(msg)) return "That email link has expired or was already used. Use “Forgot password?” to get a new one.";
+    return msg || "Something went wrong. Please try again.";
+  }
+  /** Talks to Supabase Auth directly (login, password reset). */
+  function sbAuth(path, opts) {
+    opts = opts || {};
+    var headers = { apikey: S.sb.key, "Content-Type": "application/json" };
+    if (opts.token) headers.Authorization = "Bearer " + opts.token;
+    return fetch(S.sb.url + "/auth/v1/" + path, { method: opts.method || "POST", headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined })
+      .catch(function () { throw new Error("Couldn't reach Supabase. Check your internet connection. If the Supabase project is paused (free plan), restore it at supabase.com."); })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (d) {
+          if (!res.ok) { var e = new Error(friendlyAuth(d.error_description || d.msg || d.message || d.error)); e.status = res.status; throw e; }
+          return d;
+        });
+      });
+  }
+  var refreshing = null;
+  function sbRefresh() {
+    var cur = sbStore();
+    if (!cur || !cur.refresh_token) return Promise.resolve(null);
+    refreshing = refreshing || sbAuth("token?grant_type=refresh_token", { body: { refresh_token: cur.refresh_token } })
+      .then(function (d) { return sbSave(d).access_token; })
+      .catch(function () { sbStore(null); return null; })
+      .finally(function () { refreshing = null; });
+    return refreshing;
+  }
+  function sbToken() {
+    var cur = sbStore();
+    if (!cur || !cur.access_token) return Promise.resolve(null);
+    if (cur.expires_at * 1000 - 60000 > Date.now()) return Promise.resolve(cur.access_token);
+    return sbRefresh();
+  }
+  /** Tokens arriving from an email link (#access_token=…&type=recovery|invite|signup|magiclink, or #error=…). */
+  function readAuthHash() {
+    var hash = location.hash.slice(1);
+    if (!/(^|&)(access_token|error_description|error)=/.test(hash)) return null;
+    var p = new URLSearchParams(hash);
+    history.replaceState(null, "", location.pathname + location.search);
+    if (p.get("error") || p.get("error_description")) return { error: friendlyAuth((p.get("error_description") || p.get("error") || "").replace(/\+/g, " ")) };
+    sbSave({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token"), expires_in: p.get("expires_in") || 3600, expires_at: Number(p.get("expires_at")) || 0 });
+    return { type: p.get("type") || "" };
+  }
+  function doLogout(message) {
+    if (!S.sb) { api("logout", { body: {} }).finally(function () { showLogin(message || ""); }); return; }
+    var cur = sbStore();
+    sbStore(null);
+    (cur && cur.access_token ? sbAuth("logout", { token: cur.access_token }) : Promise.resolve()).catch(function () {}).finally(function () { showSbLogin(message || ""); });
+  }
+
+  function card(children) {
+    app.className = "login";
+    app.replaceChildren(h("div", { class: "login-card" },
+      h("div", { class: "login-brand" }, h("img", { src: "/assets/img/favicon.svg", alt: "" }), "Prospecting Call Tracker"),
+      children, versionLine()));
+  }
+
+  function showSbLogin(message, isInfo) {
+    var note = h("p", { class: "banner " + (isInfo ? "banner-ok" : "banner-error"), role: isInfo ? "status" : "alert", hidden: !message, text: message || "" });
+    var email = h("input", { type: "email", id: "email", autocomplete: "username", required: true, value: (sbStore() || {}).email || "" });
+    var pw = h("input", { type: "password", id: "pw", autocomplete: "current-password", required: true });
+    var btn = h("button", { class: "b b-primary", type: "submit", text: "Log in" });
+    function say(text, ok) { note.textContent = text; note.className = "banner " + (ok ? "banner-ok" : "banner-error"); note.setAttribute("role", ok ? "status" : "alert"); note.hidden = false; }
+    var forgot = h("button", { class: "b b-ghost b-sm", type: "button", text: "Forgot password?", onclick: function () {
+      if (!email.value.trim()) { say("Type your email address first, then click “Forgot password?” again."); email.focus(); return; }
+      forgot.disabled = true;
+      sbAuth("recover?redirect_to=" + encodeURIComponent(location.origin + "/admin"), { body: { email: email.value.trim() } })
+        .then(function () { say("If " + email.value.trim() + " has an editor account, we've emailed a link to set a new password. It can take a minute — check spam too.", true); })
+        .catch(function (x) { say(x.message); })
+        .finally(function () { forgot.disabled = false; });
+    } });
+    var form = h("form", { onsubmit: function (e) {
+      e.preventDefault();
+      btn.disabled = true; btn.textContent = "Logging in…"; note.hidden = true;
+      sbAuth("token?grant_type=password", { body: { email: email.value.trim(), password: pw.value } }).then(function (d) {
+        sbSave(d); pw.value = ""; start();
+      }).catch(function (x) { say(x.message); btn.disabled = false; btn.textContent = "Log in"; pw.select(); });
+    } },
+      note,
+      h("div", { class: "field" }, h("label", { for: "email", text: "Email" }), email),
+      h("div", { class: "field" }, h("label", { for: "pw", text: "Password" }), pw),
+      btn,
+      h("div", { class: "row" }, forgot));
+    card([h("h1", { text: "Website editor" }), h("p", { class: "hint", text: "Log in with the email address your account was created with." }), form]);
+    (email.value ? pw : email).focus();
+  }
+
+  function showSetPassword(kind) {
+    var note = h("p", { class: "banner banner-error", role: "alert", hidden: true });
+    var pw = h("input", { type: "password", id: "pw-new", autocomplete: "new-password", required: true, minlength: "8" });
+    var pw2 = h("input", { type: "password", id: "pw-new2", autocomplete: "new-password", required: true, minlength: "8" });
+    var btn = h("button", { class: "b b-primary", type: "submit", text: "Save password and continue" });
+    var form = h("form", { onsubmit: function (e) {
+      e.preventDefault();
+      note.hidden = true;
+      if (pw.value.length < 8) { note.textContent = "Please use at least 8 characters (12 or more is better)."; note.hidden = false; return; }
+      if (pw.value !== pw2.value) { note.textContent = "The two passwords don't match."; note.hidden = false; return; }
+      btn.disabled = true; btn.textContent = "Saving…";
+      sbToken().then(function (t) {
+        if (!t) throw new Error("That email link has expired. Use “Forgot password?” to get a new one.");
+        return sbAuth("user", { method: "PUT", token: t, body: { password: pw.value } });
+      }).then(function (d) {
+        var cur = sbStore() || {}; cur.email = d.email || cur.email; sbStore(cur);
+        toast("Password saved.", "ok"); start();
+      }).catch(function (x) { note.textContent = x.message; note.hidden = false; btn.disabled = false; btn.textContent = "Save password and continue"; });
+    } },
+      note,
+      h("div", { class: "field" }, h("label", { for: "pw-new", text: "New password" }), h("p", { class: "hint", text: "At least 8 characters. A short sentence is easy to remember and hard to guess." }), pw),
+      h("div", { class: "field" }, h("label", { for: "pw-new2", text: "Type it again" }), pw2),
+      btn);
+    card([h("h1", { text: kind === "invite" ? "Welcome! Choose your password" : "Choose a new password" }), form]);
+    pw.focus();
+  }
+
+  /** Explains a response that isn't from the editor's server (a Vercel error page) in plain English. */
+  function serverProblem(res) {
+    var code = res.headers.get("x-vercel-error") || "";
+    if (res.status === 404) return "The editor's server part isn't on this deployment (" + (code || "404") + "). The live deployment is probably older than the editor: in Vercel → Deployments, redeploy the newest commit to Production.";
+    if (code === "FUNCTION_INVOCATION_TIMEOUT" || res.status === 504) return "The editor's server took too long to answer (" + (code || res.status) + "). Please try again.";
+    if (/^FUNCTION_|^NO_RESPONSE/.test(code) || res.status >= 500) return "The editor's server hit an error (" + (code || res.status) + "). In Vercel → your project → Logs, look for “[website editor]” to see why, or try again in a minute.";
+    if (res.status === 401 || res.status === 403) return "Vercel blocked the request (" + (code || res.status) + "). If Deployment Protection is on for this address, turn it off for Production in Vercel → Settings → Deployment Protection.";
+    return "Something went wrong (" + (code || res.status) + "). Please try again.";
   }
 
   /* ================================================================ dirty state and drafts */
@@ -251,7 +423,7 @@
       h("div", { class: "login-brand" }, h("img", { src: "/assets/img/favicon.svg", alt: "" }), "Prospecting Call Tracker"),
       h("h1", { text: "Website editor" }),
       h("p", { class: "hint", text: "Change any text, price, link, photo or color on your website, then publish." }),
-      setup, form));
+      setup, form, versionLine()));
     pw.focus();
   }
 
@@ -268,13 +440,19 @@
 
   function boot() {
     api("session").then(function (s) {
-      S.repo = s.repo; S.branch = s.branch; S.deployment = s.deployment || "";
+      S.repo = s.repo; S.branch = s.branch; S.deployment = s.deployment || ""; S.version = s.version || "";
+      if (s.mode === "supabase") {
+        S.sb = { url: s.supabaseUrl, key: s.supabaseKey };
+        var link = readAuthHash();
+        if (link && link.error) return showSbLogin(link.error);
+        if (link && /recovery|invite/.test(link.type)) return showSetPassword(link.type);
+        return sbToken().then(function (t) { if (t) start(); else showSbLogin(""); });
+      }
       if (s.directus) return showDirectus(s.directus);
       if (s.loggedIn) start();
       else showLogin("", s.configured);
     }).catch(function (e) {
-      app.className = "boot";
-      app.textContent = e.message;
+      showProblem("The editor couldn't start.", e.message, false);
     });
   }
 
@@ -283,7 +461,7 @@
     app.textContent = "Loading your website content…";
     api("content").then(function (d) {
       if (!d.content) {
-        app.textContent = d.error || "The content file could not be read.";
+        showProblem("Your website content file has a formatting mistake, so the editor can't open it.", d.error || "");
         return;
       }
       S.site = d.content; S.sha = d.sha; S.saved = JSON.stringify(d.content);
@@ -292,9 +470,44 @@
       try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { draft = null; }
       if (draft && draft.json && draft.json !== S.saved) offerDraft(draft);
       go(firstSection());
+      // Quietly confirm publishing will work (e.g. a read-only token), and warn now rather than at Publish time.
+      api("check").then(function (r) {
+        var bad = r.steps.filter(function (x) { return !x.ok; });
+        if (!bad.length) return;
+        document.getElementById("notices").appendChild(h("div", { class: "banner banner-error", role: "alert" },
+          h("p", null, h("b", { text: "Heads up: " }), bad[0].fix || "Check failed: " + bad[0].name + ".")));
+      }).catch(function () { /* the check is a convenience only */ });
     }).catch(function (e) {
-      if (e.status !== 401) { app.className = "boot"; app.textContent = e.message; }
+      if (e.status !== 401) showProblem("You're logged in, but the editor couldn't load your website content.", e.message, e.status !== 403);
     });
+  }
+
+  /** Friendly error screen with a step-by-step connection check and a "Try again" button. */
+  function showProblem(title, detail, runCheck) {
+    var steps = h("div", { class: "check-list", "aria-live": "polite" }, runCheck ? h("p", { class: "hint", text: "Running a connection check…" }) : null);
+    app.className = "login";
+    app.replaceChildren(h("div", { class: "login-card wide" },
+      h("div", { class: "login-brand" }, h("img", { src: "/assets/img/favicon.svg", alt: "" }), "Prospecting Call Tracker"),
+      h("h1", { text: "Almost there" }),
+      h("p", { text: title }),
+      detail ? h("p", { class: "banner banner-error", role: "alert", text: detail }) : null,
+      steps,
+      h("div", { class: "row" },
+        h("button", { class: "b b-primary", type: "button", text: "Try again", onclick: function () { start(); } }),
+        h("button", { class: "b", type: "button", text: "Log out", onclick: function () { doLogout(""); } })),
+      versionLine()));
+    if (!runCheck) return;
+    api("check").then(function (r) {
+      steps.replaceChildren(h("h2", { text: "Connection check" }), h("ul", { class: "checks" }, r.steps.map(function (x) {
+        return h("li", { class: x.ok ? "ok" : "bad" }, h("span", { class: "check-mark", "aria-hidden": "true", text: x.ok ? "✓" : "✕" }), h("div", null,
+          h("b", { text: x.name }), h("span", { class: "sr-only", text: x.ok ? " — OK" : " — needs fixing" }), x.fix && x.fix !== detail ? h("p", { class: "hint", text: x.fix }) : null));
+      })));
+    }).catch(function (x) { steps.replaceChildren(h("p", { class: "hint", text: "Connection check couldn't run: " + x.message })); });
+  }
+
+  function versionLine() {
+    var bits = [S.version ? "Version " + S.version : "", S.deployment || ""].filter(Boolean);
+    return bits.length ? h("p", { class: "version", text: bits.join(" · ") }) : null;
   }
   function firstSection() { return location.hash.length > 1 ? decodeURIComponent(location.hash.slice(1)) : "todo"; }
 
@@ -326,13 +539,13 @@
     app.replaceChildren(
       h("header", { class: "topbar" },
         menuBtn,
-        h("a", { class: "topbar-brand", href: "/admin" }, h("img", { src: "/assets/img/favicon.svg", alt: "" }), "Website editor", h("small", { text: S.repo ? "· " + S.repo : "" })),
+        h("a", { class: "topbar-brand", href: "/admin" }, h("img", { src: "/assets/img/favicon.svg", alt: "" }), "Website editor", h("small", { text: S.sb ? "· " + ((sbStore() || {}).email || "") : S.repo ? "· " + S.repo : "" })),
         h("span", { id: "status", class: "status", role: "status", text: "All changes published" }),
         h("a", { class: "b b-dark", href: "/", target: "_blank", rel: "noopener", text: "View website ↗" }),
         publish,
         h("button", { class: "b b-dark", type: "button", text: "Log out", onclick: function () {
           if (isDirty() && !confirm("You have unpublished changes. They'll be kept on this computer as a draft. Log out?")) return;
-          api("logout", { body: {} }).finally(function () { showLogin("You're logged out."); });
+          doLogout("You're logged out.");
         } })),
       h("div", { class: "layout" }, side, h("main", { class: "main", id: "main", tabindex: "-1" }, h("div", { class: "main-inner" }, h("div", { id: "notices" }), h("div", { id: "view" })))));
     buildSidebar();
@@ -601,7 +814,7 @@
     var inp = h("input", { type: "text", id: id, value: value || "", spellcheck: "false" });
     var thumbBox = h("div");
     function drawThumb(v) {
-      var src = S.previews[v] || v;
+      var src = S.previews[v] || (S.sb && String(v).indexOf("/assets/media/") === 0 ? "/api/admin?action=file&name=" + encodeURIComponent(String(v).slice(14)) : v);
       thumbBox.replaceChildren(v ? h("img", { class: "thumb", src: src, alt: "", onerror: function (e) { e.target.replaceWith(h("div", { class: "thumb thumb-empty", text: "Shows after publishing" })); } }) : h("div", { class: "thumb thumb-empty", text: "No image" }));
     }
     drawThumb(value);
@@ -794,8 +1007,11 @@
         try { localStorage.removeItem(DRAFT_KEY); } catch (x) { /* ignore */ }
         dlg.close(); dlg.remove();
         S.publishing = "pending"; updateStatus(); updateCounts();
-        toast("Published! Your website is rebuilding and will be live in about a minute.", "ok", 8000);
-        watchDeploy(r.commit, Date.now());
+        if (r.deployHookSet === false) toast("Saved — but the website won't update until VERCEL_DEPLOY_HOOK is added in Vercel (see the yellow note at the top).", "error", 12000);
+        else if (r.deployTriggered === false) toast("Saved — but Vercel didn't accept the rebuild request. Check VERCEL_DEPLOY_HOOK in Vercel, or redeploy there.", "error", 12000);
+        else toast("Published! Your website is rebuilding and will be live in about a minute.", "ok", 8000);
+        if (r.commit) watchDeploy(r.commit, Date.now());
+        else setTimeout(function () { if (S.publishing === "pending") { S.publishing = null; updateStatus(); } }, 90000);
       }).catch(function (x) {
         err.textContent = x.status === 422 ? "This change can't be published yet:\n" + x.message : x.message;
         err.hidden = false; go2.disabled = false; go2.textContent = "Publish now";
@@ -836,7 +1052,7 @@
         list.appendChild(h("div", { class: "history-item" },
           h("div", null, h("p", null, h("b", { text: c.message })), h("p", { class: "todo-where", text: fmtDate(c.date) + (c.author ? " · " + c.author : "") + (i === 0 ? " · current version" : "") })),
           h("div", { class: "row" },
-            h("a", { class: "b b-sm b-ghost", href: c.url, target: "_blank", rel: "noopener", text: "Details ↗" }),
+            c.url ? h("a", { class: "b b-sm b-ghost", href: c.url, target: "_blank", rel: "noopener", text: "Details ↗" }) : null,
             i === 0 ? null : h("button", { class: "b b-sm", type: "button", text: "Load this version", onclick: function (e) {
               if (isDirty() && !confirm("This replaces your unpublished changes in the editor. Continue?")) return;
               e.target.disabled = true;
@@ -855,7 +1071,14 @@
 
   function loadMedia(force) {
     if (S.media && !force) return Promise.resolve(S.media);
-    return api("media").then(function (d) { S.media = d.items; return S.media; });
+    if (!S.sb) return api("media").then(function (d) { S.media = d.items; return S.media; });
+    // Supabase mode: uploads come from Supabase storage; the site's own images from the build's list.
+    var own = fetch("/admin/assets.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+    return Promise.all([api("media"), own]).then(function (r) {
+      r[0].items.forEach(function (m) { if (m.preview) S.previews[m.path] = S.previews[m.path] || m.preview; });
+      S.media = r[0].items.concat(r[1]);
+      return S.media;
+    });
   }
   var IMG_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
 
@@ -863,7 +1086,7 @@
     var grid = h("div", { class: "media-grid" }, h("p", { text: "Loading…" }));
     loadMedia().then(function (items) {
       var list = items.filter(function (m) { return kind === "image" ? IMG_RE.test(m.name) : kind === "file" ? !IMG_RE.test(m.name) : true; });
-      list.sort(function (a, b) { return (a.folder === "assets/uploads" ? 0 : 1) - (b.folder === "assets/uploads" ? 0 : 1); });
+      list.sort(function (a, b) { var up = function (m) { return m.folder === "assets/uploads" || m.folder === "assets/media" ? 0 : 1; }; return up(a) - up(b); });
       grid.replaceChildren();
       if (!list.length) grid.appendChild(h("p", { class: "hint", text: "Nothing uploaded yet." }));
       list.forEach(function (m) {

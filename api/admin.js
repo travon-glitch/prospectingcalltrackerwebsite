@@ -14,7 +14,10 @@
 // the X-PCT-Admin header (browsers never add it on cross-site requests) and JSON, which blocks cross-site forgery.
 
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { parseContent, validateSite } from "../templates/validate.mjs";
+// The content checker (page templates) is loaded only when content is read or published, so a problem there can never
+// stop you from logging in.
+const checker = () => import("../templates/validate.mjs");
+import { createSupabaseActions, supabaseEnv } from "./_supabase.js";
 
 const CONTENT_PATH = "content/site.json";
 const SESSION_HOURS = 12;
@@ -38,8 +41,11 @@ const env = () => ({
   token: (process.env.GITHUB_TOKEN || "").trim(),
   repo: repoName(process.env.GITHUB_REPO) || (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}` : ""),
   deployment: process.env.VERCEL_ENV || "", // "production", "preview" or "development" on Vercel
+  version: (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7),
   branch: process.env.GITHUB_BRANCH || "main",
   api: (process.env.GITHUB_API || "https://api.github.com").replace(/\/$/, ""),
+  // Supabase mode (login + content + photos in Supabase) when SUPABASE_URL and SUPABASE_ANON_KEY are set.
+  supabase: supabaseEnv(),
   // When the site reads its content from Directus, Directus is the editor and this one steps aside.
   directus: process.env.DIRECTUS_URL && process.env.DIRECTUS_TOKEN ? process.env.DIRECTUS_URL.replace(/\/$/, "") : "",
 });
@@ -81,18 +87,25 @@ function loggedIn(req, e) {
 
 /* ------------------------------------------------------------------ GitHub */
 
-async function github(e, method, path, body) {
-  const res = await fetch(`${e.api}/repos/${e.repo}${path}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${e.token}`,
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "pct-website-editor",
-      ...(body ? { "Content-Type": "application/json" } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+/** Calls the GitHub API. Returns { status, json } and never throws for HTTP errors (see github() for that). */
+async function githubRaw(e, method, path, body) {
+  let res;
+  try {
+    res = await fetch(`${e.api}/repos/${e.repo}${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${e.token}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "pct-website-editor",
+        ...(body ? { "Content-Type": "application/json" } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(20000),
+    });
+  } catch {
+    throw new HttpError(504, "The editor couldn't reach GitHub just now. Please try again in a minute.");
+  }
   const text = await res.text();
   let json = null;
   try {
@@ -100,14 +113,34 @@ async function github(e, method, path, body) {
   } catch {
     json = null;
   }
-  if (!res.ok) {
-    if (res.status === 401) throw new HttpError(502, "GitHub refused the token. Check GITHUB_TOKEN in Vercel (it may have expired).");
-    if (res.status === 403) throw new HttpError(502, "The GitHub token doesn't have permission for this. It needs Contents: Read and write on this repository.");
-    if (res.status === 409 || (res.status === 422 && /sha/i.test(json?.message || ""))) throw new HttpError(409, "The website was changed somewhere else after you opened the editor. Reload the editor to get the latest version, then make your change again.");
-    const err = new HttpError(res.status === 404 ? 404 : 502, `GitHub: ${json?.message || res.statusText}`);
-    throw err;
+  return { status: res.status, ok: res.ok, json, headers: res.headers };
+}
+
+const TOKEN_HELP = "In GitHub → Settings → Developer settings → Fine-grained tokens, the token needs Repository access to this repository and Repository permissions → Contents: Read and write. Then put it in Vercel as GITHUB_TOKEN (Production) and redeploy.";
+
+/** Plain-English reason for a failed GitHub call, with the fix. */
+async function explain(e, r, path) {
+  const msg = r.json?.message || "";
+  if (r.status === 401) return new HttpError(502, `GitHub says the token in GITHUB_TOKEN is not valid (it may have expired, been deleted, or been copied incompletely). Create a new one. ${TOKEN_HELP}`);
+  if (r.status === 403 && /rate limit/i.test(msg)) return new HttpError(503, "GitHub is limiting requests right now. Wait a few minutes and try again.");
+  if (r.status === 403) return new HttpError(502, `The GitHub token isn't allowed to do this (${msg || "forbidden"}). ${TOKEN_HELP}`);
+  if (r.status === 409 || (r.status === 422 && /sha/i.test(msg))) return new HttpError(409, "The website was changed somewhere else after you opened the editor. Reload the editor to get the latest version, then make your change again.");
+  if (r.status === 404) {
+    // Was it the repository (wrong name / no access) or the file/branch?
+    const repo = path === "" ? r : await githubRaw(e, "GET", "");
+    if (repo.status === 404 || repo.status === 403) return new HttpError(502, `GitHub can't find the repository “${e.repo}” with this token. Either GITHUB_REPO is spelled wrong (it should be owner/name, e.g. travon-glitch/prospectingcalltrackerwebsite), or the token wasn't given access to this repository. ${TOKEN_HELP}`);
+    if (repo.status === 401) return explain(e, repo, "");
+    const branch = await githubRaw(e, "GET", `/branches/${encodeURIComponent(e.branch)}`);
+    if (branch.status === 404) return new HttpError(502, `The repository has no branch called “${e.branch}”. Set GITHUB_BRANCH in Vercel to the branch the website deploys from (usually main), then redeploy.`);
+    return new HttpError(404, `GitHub: not found (${path.split("?")[0] || "/"}).`);
   }
-  return json;
+  return new HttpError(502, `GitHub returned an error (${r.status}${msg ? `: ${msg}` : ""}). Please try again.`);
+}
+
+async function github(e, method, path, body) {
+  const r = await githubRaw(e, method, path, body);
+  if (!r.ok) throw await explain(e, r, path);
+  return r.json;
 }
 
 const enc = (p) => p.split("/").map(encodeURIComponent).join("/");
@@ -142,6 +175,13 @@ async function readBody(req) {
   }
 }
 
+function sendRaw(res, status, buffer, headers = {}) {
+  res.statusCode = status;
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  for (const [k, v] of Object.entries(headers)) res.setHeader(k, v);
+  res.end(buffer);
+}
+
 function send(res, status, data, extraHeaders = {}) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -172,7 +212,29 @@ function safeFileName(name) {
 const actions = {
   async session(req, e) {
     if (e.directus) return { loggedIn: false, directus: e.directus };
-    return { loggedIn: loggedIn(req, e), configured: { password: !!e.password, token: !!e.token, repo: !!e.repo }, repo: e.repo, branch: e.branch, deployment: e.deployment };
+    return { loggedIn: loggedIn(req, e), configured: { password: !!e.password, token: !!e.token, repo: !!e.repo }, missing: missingSettings(e), repo: e.repo, branch: e.branch, deployment: e.deployment, version: e.version };
+  },
+
+  /** Step-by-step connection check (after login): settings, token, repository, write permission, branch, content file. */
+  async check(req, e) {
+    const steps = [];
+    const add = (name, ok, fix = "") => steps.push({ name, ok, fix });
+    add("Vercel settings ADMIN_PASSWORD, GITHUB_TOKEN, GITHUB_REPO", true);
+    const repo = await githubRaw(e, "GET", "");
+    if (!repo.ok) {
+      add(`GitHub token can open ${e.repo}`, false, (await explain(e, repo, "")).message);
+      return { ok: false, steps };
+    }
+    add(`GitHub token can open ${e.repo}`, true);
+    const canWrite = repo.json?.permissions ? !!repo.json.permissions.push : null;
+    add("GitHub token can save changes (Contents: Read and write)", canWrite !== false, canWrite === false ? `The token can only read. ${TOKEN_HELP}` : "");
+    const branch = await githubRaw(e, "GET", `/branches/${encodeURIComponent(e.branch)}`);
+    add(`Branch “${e.branch}” exists`, branch.ok, branch.ok ? "" : `Set GITHUB_BRANCH in Vercel to the branch the website deploys from (usually main), then redeploy.`);
+    if (branch.ok) {
+      const file = await githubRaw(e, "GET", `/contents/${enc(CONTENT_PATH)}?ref=${encodeURIComponent(e.branch)}`);
+      add(`${CONTENT_PATH} found on “${e.branch}”`, file.ok, file.ok ? "" : `The website content file is missing from that branch. Make sure the latest website code is on GitHub.`);
+    }
+    return { ok: steps.every((x) => x.ok), steps };
   },
 
   async login(req, e, body, res) {
@@ -198,18 +260,18 @@ const actions = {
     const ref = url.searchParams.get("ref");
     if (ref && !/^[0-9a-f]{7,40}$/i.test(ref)) throw new HttpError(400, "Unknown version.");
     const { raw, sha: fileSha } = await readContent(e, ref || undefined);
-    const parsed = parseContent(raw);
+    const parsed = (await checker()).parseContent(raw);
     return { content: parsed.site ?? null, raw: parsed.site ? undefined : raw, error: parsed.error, sha: ref ? undefined : fileSha };
   },
 
   async validate(req, e, body) {
-    return { problems: validateSite(body.content) };
+    return { problems: (await checker()).validateSite(body.content) };
   },
 
   async save(req, e, body) {
     if (!body.content || typeof body.content !== "object") throw new HttpError(400, "Nothing to save.");
     if (!body.sha) throw new HttpError(400, "Reload the editor and try again.");
-    const problems = validateSite(body.content);
+    const problems = (await checker()).validateSite(body.content);
     if (problems.length) throw new HttpError(422, problems.join("\n"));
     const text = JSON.stringify(body.content, null, 2) + "\n";
     if (text.length > 900 * 1024) throw new HttpError(413, "The content file is getting too large. Move long text into separate pages.");
@@ -298,11 +360,44 @@ const actions = {
 const PUBLIC = new Set(["session", "login"]);
 const WRITES = new Set(["login", "logout", "save", "upload", "validate"]);
 
+/* ------------------------------------------------------------------ Supabase mode */
+
+const SB_PUBLIC = new Set(["session", "file"]);
+const SB_WRITES = new Set(["save", "upload", "validate"]);
+let sbKit = null;
+
+async function handleSupabase(req, res, e, name, url) {
+  const s = e.supabase;
+  sbKit ??= createSupabaseActions({ HttpError, checker, safeFileName, sendRaw });
+  if (name === "session") {
+    return send(res, 200, {
+      mode: "supabase",
+      loggedIn: false, // the browser keeps the Supabase login itself
+      supabaseUrl: s.url,
+      supabaseKey: s.key, // the public ("anon"/"publishable") key: safe to share, Supabase's security rules protect the data
+      configured: { url: true, key: true, hook: !!s.hook },
+      missing: s.hook ? [] : ["VERCEL_DEPLOY_HOOK"],
+      deployment: e.deployment,
+      version: e.version,
+    });
+  }
+  const action = Object.hasOwn(sbKit.actions, name) ? sbKit.actions[name] : null;
+  if (!action) throw new HttpError(404, name === "login" || name === "logout" ? "Log in with your email and password on the editor page." : "Unknown action.");
+  const isWrite = SB_WRITES.has(name);
+  if (isWrite !== (req.method === "POST")) throw new HttpError(405, "Wrong method.");
+  if (isWrite && (req.headers["x-pct-admin"] !== "1" || !/^application\/json/i.test(req.headers["content-type"] || ""))) throw new HttpError(403, "Request blocked.");
+  const user = SB_PUBLIC.has(name) ? null : await sbKit.authenticate(req, s);
+  const body = isWrite ? await readBody(req) : {};
+  const data = await action(req, s, user, body, url, res);
+  if (data !== undefined) send(res, 200, data);
+}
+
 export default async function handler(req, res) {
   const e = env();
   const url = new URL(req.url, "http://localhost");
-  const name = url.searchParams.get("action") || "";
+  const name = url.searchParams.get("action") || (req.method === "GET" ? "session" : "");
   try {
+    if (e.supabase.on) return await handleSupabase(req, res, e, name, url);
     const action = Object.hasOwn(actions, name) ? actions[name] : null;
     if (!action) throw new HttpError(404, "Unknown action.");
     const isWrite = WRITES.has(name);
@@ -317,7 +412,7 @@ export default async function handler(req, res) {
     send(res, 200, data);
   } catch (err) {
     const status = err instanceof HttpError ? err.status : 500;
-    if (status === 500) console.error(err);
+    if (status === 500) console.error("[website editor]", err);
     send(res, status, { error: status === 500 ? "Something went wrong on the server. Please try again." : err.message });
   }
 }
