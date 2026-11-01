@@ -8,16 +8,65 @@ It is deployed as its **own Vercel project**, separate from the CRM app, and doe
 
 ```
 (repository root)
-  content/site.json     ← ALL the words, prices, links, contact details and settings. Edit this file.
+  content/site.json     ← ALL the words, prices, links, contact details and settings (edited by /admin).
+  admin/                ← the website editor (opens at /admin)
+  api/admin.js          ← the editor's server part (login, publish, uploads) — runs on Vercel
+  assets/uploads/       ← photos uploaded in the editor
   assets/               ← styles.css, site.js (menu, forms, analytics), images, placeholders
-  templates/            ← how the pages are laid out (only for design changes)
+  templates/            ← how the pages are laid out (only for design changes); validate.mjs checks content before publishing
   build.mjs             ← builds the site into dist/
   check.mjs             ← checks the built site (links, headings, labels…)
   serve.mjs             ← previews dist/ on your computer
   vercel.json           ← Vercel settings and security headers
 ```
 
-## 1. Changing text
+## 0. The website editor (easiest way to change anything)
+
+Go to **https://YOUR-DOMAIN/admin**, log in with your password, change what you want, and click **Publish changes**.
+The site updates in about a minute. No coding, no GitHub.
+
+What you can do there:
+
+- **Every page**: headlines, text, buttons, FAQs, pricing cards, testimonials, features, steps, legal pages, Google listing.
+- **To-do list**: every placeholder still waiting for your real info, with a **Fix** button that jumps straight to it.
+- **Photos & files**: upload from your computer (big photos are shrunk automatically), then pick them for the founder photo,
+  screenshots, social-share image or any page. The **Media library** lists everything uploaded.
+- **Extra pages**: add new pages (guides, landing pages, service pages) with their own web address. Add them to the top menu
+  under **Menu & buttons**.
+- **Menu, buttons, footer, contact details, social links, forms, analytics and brand colors.**
+- **History & undo**: every publish is saved. Load any older version and publish it to put it back.
+- Unpublished edits are kept on your computer as a draft, so closing the tab doesn't lose your work. Ctrl+S / ⌘S publishes.
+- A change that would break the site (for example a bad web address for a new page) is refused with a plain-English
+  message, and the live site stays as it is.
+
+### One-time setup (about 5 minutes)
+
+1. **Create a GitHub token** the editor uses to save your changes: GitHub → your photo → **Settings → Developer settings →
+   Personal access tokens → Fine-grained tokens → Generate new token**.
+   - Name: `Website editor`. Expiration: up to 1 year (put a reminder in your calendar to renew it).
+   - Repository access: **Only select repositories** → this website's repository.
+   - Permissions → Repository permissions: **Contents: Read and write**. Optional: **Deployments: Read-only** (lets the
+     editor tell you when the change is live).
+   - Click **Generate token** and copy it.
+2. In **Vercel → your website project → Settings → Environment Variables**, add:
+   | Name | Value |
+   | --- | --- |
+   | `ADMIN_PASSWORD` | a long password only you know (it is the only thing protecting the editor) |
+   | `GITHUB_TOKEN` | the token from step 1 |
+   | `GITHUB_REPO` | optional: `owner/repository` (Vercel fills it in automatically when the project is linked to GitHub) |
+   | `GITHUB_BRANCH` | optional: the branch the live site deploys from (default `main`) |
+3. **Deployments → ⋯ → Redeploy** so the new settings take effect, then open `/admin`.
+
+To change the password, change `ADMIN_PASSWORD` in Vercel and redeploy (everyone logged in is logged out). If the token
+expires, the editor says so; create a new one and replace `GITHUB_TOKEN`.
+
+How it works: the editor (`admin/`) and its small server part (`api/admin.js`) read and write `content/site.json` and
+`assets/uploads/` in this GitHub repository. Each publish is a normal Git commit, so Vercel rebuilds the site and you
+keep a full history. Nothing else (no database, no plugins, nothing to update).
+
+## 1. Changing text by hand (optional)
+
+The editor above does all of this for you.
 
 Open `content/site.json` (on GitHub: open the file, click the pencil ✏️, edit, then **Commit changes**). Vercel rebuilds the
 site automatically in about a minute.

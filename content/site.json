@@ -1,6 +1,5 @@
 {
-  "_readme": "ALL website copy lives in this file. Edit the text between the quotes, save, then run `node build.mjs` (or push to GitHub and Vercel rebuilds). Anything in [square brackets] or marked placeholder is waiting for your real information. See README.md.",
-
+  "_readme": "ALL website copy lives in this file. The easiest way to change it is the website editor at /admin (see README.md). You can also edit it here on GitHub: change only the text between the quotes. Anything in [square brackets] or marked placeholder is waiting for your real information.",
   "site": {
     "name": "Prospecting Call Tracker",
     "url": "https://www.prospectingcalltracker.com",
@@ -13,7 +12,6 @@
     "twitterHandle": "",
     "googleFontsCss": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
   },
-
   "contact": {
     "email": "",
     "phone": "",
@@ -21,35 +19,93 @@
     "hours": "Monday–Friday, 9am–6pm",
     "responseNote": "We usually reply within one business day."
   },
-
   "social": [
-    { "label": "Facebook", "url": "" },
-    { "label": "Instagram", "url": "" },
-    { "label": "LinkedIn", "url": "" },
-    { "label": "YouTube", "url": "" }
+    {
+      "label": "Facebook",
+      "url": ""
+    },
+    {
+      "label": "Instagram",
+      "url": ""
+    },
+    {
+      "label": "LinkedIn",
+      "url": ""
+    },
+    {
+      "label": "YouTube",
+      "url": ""
+    }
   ],
-
   "analytics": {
     "_help": "Leave both empty and no analytics script loads. Google Analytics 4: put your Measurement ID (G-XXXXXXX). Plausible: put your site domain (e.g. prospectingcalltracker.com).",
     "googleAnalyticsId": "",
     "plausibleDomain": "",
     "plausibleScript": "https://plausible.io/js/script.js"
   },
-
+  "theme": {
+    "_help": "Brand colors used across the website. Use the color pickers in the website editor, or a hex code like #12A150.",
+    "accentColor": "#12A150",
+    "accentDarkColor": "#0C7F3E",
+    "darkColor": "#0B1B33",
+    "darkColor2": "#13294B",
+    "footerColor": "#081427"
+  },
   "forms": {
     "_help": "endpoint = your CRM address + /api/public/website-lead. Until it is set, forms show a friendly 'not connected yet' message and nothing is sent.",
     "endpoint": "https://YOUR-CRM-DOMAIN/api/public/website-lead",
     "thankYouPath": "/thank-you",
     "consentText": "I agree that Prospecting Call Tracker may contact me by phone call, text message, and email about my request. Message and data rates may apply. Consent is not a condition of purchase. Reply STOP to opt out of texts.",
-    "agentOptions": ["Just me", "2–5 agents", "6–10 agents", "11–25 agents", "26–50 agents", "50+ agents"],
-    "interestOptions": ["Software", "Consulting", "Both"],
+    "agentOptions": [
+      "Just me",
+      "2–5 agents",
+      "6–10 agents",
+      "11–25 agents",
+      "26–50 agents",
+      "50+ agents"
+    ],
+    "interestOptions": [
+      "Software",
+      "Consulting",
+      "Both"
+    ],
     "requestTypes": {
-      "demo": { "label": "Request a software demo", "event": "demo_request_submit", "cta": "Request a Software Demo", "success": "Thanks — your demo request is in. We'll reach out to pick a time that works for you." },
-      "strategy_call": { "label": "Book a free strategy call", "event": "strategy_call_submit", "cta": "Book a Free Prospecting Strategy Call", "success": "Thanks — we'll reach out to schedule your free strategy call." },
-      "audit": { "label": "Get a free prospecting system audit", "event": "audit_request_submit", "cta": "Get a Free Prospecting System Audit", "success": "Thanks — we'll reach out with a few questions to start your system audit." },
-      "founding_team": { "label": "Join the Founding Team Program", "event": "founding_team_submit", "cta": "Join the Founding Team Program", "success": "Thanks for your interest in the Founding Team Program. We'll reach out to talk about fit and next steps." },
-      "kpi_download": { "label": "Download the Prospecting KPI Tracker", "event": "kpi_download_submit", "cta": "Download the Prospecting KPI Tracker", "success": "Thanks — we'll email you the Prospecting KPI Tracker." },
-      "contact": { "label": "General question", "event": "contact_submit", "cta": "Contact", "success": "Thanks for reaching out. We'll get back to you soon." }
+      "demo": {
+        "label": "Request a software demo",
+        "event": "demo_request_submit",
+        "cta": "Request a Software Demo",
+        "success": "Thanks — your demo request is in. We'll reach out to pick a time that works for you."
+      },
+      "strategy_call": {
+        "label": "Book a free strategy call",
+        "event": "strategy_call_submit",
+        "cta": "Book a Free Prospecting Strategy Call",
+        "success": "Thanks — we'll reach out to schedule your free strategy call."
+      },
+      "audit": {
+        "label": "Get a free prospecting system audit",
+        "event": "audit_request_submit",
+        "cta": "Get a Free Prospecting System Audit",
+        "success": "Thanks — we'll reach out with a few questions to start your system audit."
+      },
+      "founding_team": {
+        "label": "Join the Founding Team Program",
+        "event": "founding_team_submit",
+        "cta": "Join the Founding Team Program",
+        "success": "Thanks for your interest in the Founding Team Program. We'll reach out to talk about fit and next steps."
+      },
+      "kpi_download": {
+        "label": "Download the Prospecting KPI Tracker",
+        "event": "kpi_download_submit",
+        "cta": "Download the Prospecting KPI Tracker",
+        "success": "Thanks — we'll email you the Prospecting KPI Tracker."
+      },
+      "contact": {
+        "label": "General question",
+        "event": "contact_submit",
+        "cta": "Contact",
+        "success": "Thanks for reaching out. We'll get back to you soon."
+      }
     },
     "ctaSlugs": {
       "strategy-call": "strategy_call",
@@ -60,87 +116,265 @@
       "contact": "contact"
     }
   },
-
   "media": {
-    "_help": "Swap placeholders: put your file in website/assets/ and change src. For a demo video paste a YouTube or Vimeo EMBED link (https://www.youtube-nocookie.com/embed/VIDEO_ID or https://player.vimeo.com/video/VIDEO_ID).",
-    "founderPhoto": { "src": "/assets/placeholders/founder-photo.svg", "alt": "Founder photo placeholder — replace with a professional photo of the founder", "placeholder": true },
-    "demoVideo": { "embedUrl": "", "title": "Prospecting Call Tracker software walkthrough", "poster": "/assets/placeholders/demo-video.svg", "placeholderNote": "Demo video placeholder — add your walkthrough video link in site.json → media.demoVideo.embedUrl" },
+    "_help": "Swap placeholders: put your file in assets/ and change src. For a demo video paste a YouTube or Vimeo EMBED link (https://www.youtube-nocookie.com/embed/VIDEO_ID or https://player.vimeo.com/video/VIDEO_ID).",
+    "founderPhoto": {
+      "src": "/assets/placeholders/founder-photo.svg",
+      "alt": "Founder photo placeholder — replace with a professional photo of the founder",
+      "placeholder": true
+    },
+    "demoVideo": {
+      "embedUrl": "",
+      "title": "Prospecting Call Tracker software walkthrough",
+      "poster": "/assets/placeholders/demo-video.svg",
+      "placeholderNote": "Demo video placeholder — add your walkthrough video link in site.json → media.demoVideo.embedUrl"
+    },
     "screenshots": [
-      { "src": "/assets/placeholders/crm-screenshot.svg", "alt": "CRM screenshot placeholder — replace with a real screenshot of the lead list", "caption": "Screenshot placeholder: lead list", "placeholder": true },
-      { "src": "/assets/placeholders/crm-screenshot.svg", "alt": "CRM screenshot placeholder — replace with a real screenshot of the dialer", "caption": "Screenshot placeholder: dialer and current lead", "placeholder": true },
-      { "src": "/assets/placeholders/crm-screenshot.svg", "alt": "CRM screenshot placeholder — replace with a real screenshot of the team scoreboard", "caption": "Screenshot placeholder: weekly team scoreboard", "placeholder": true }
+      {
+        "src": "/assets/placeholders/crm-screenshot.svg",
+        "alt": "CRM screenshot placeholder — replace with a real screenshot of the lead list",
+        "caption": "Screenshot placeholder: lead list",
+        "placeholder": true
+      },
+      {
+        "src": "/assets/placeholders/crm-screenshot.svg",
+        "alt": "CRM screenshot placeholder — replace with a real screenshot of the dialer",
+        "caption": "Screenshot placeholder: dialer and current lead",
+        "placeholder": true
+      },
+      {
+        "src": "/assets/placeholders/crm-screenshot.svg",
+        "alt": "CRM screenshot placeholder — replace with a real screenshot of the team scoreboard",
+        "caption": "Screenshot placeholder: weekly team scoreboard",
+        "placeholder": true
+      }
     ],
     "kpiTrackerDownloadUrl": ""
   },
-
   "ctas": {
-    "strategyCall": { "label": "Book a Free Strategy Call", "href": "/demo?cta=strategy-call" },
-    "strategyCallLong": { "label": "Book a Free Prospecting Strategy Call", "href": "/demo?cta=strategy-call" },
-    "demo": { "label": "Request a Software Demo", "href": "/demo?cta=software-demo" },
-    "audit": { "label": "Get a Free Prospecting System Audit", "href": "/demo?cta=system-audit" },
-    "seeSoftware": { "label": "See the Software", "href": "/software" },
-    "seeCrm": { "label": "See How the CRM Works", "href": "/software" },
-    "watchDemo": { "label": "Watch Demo", "href": "/software#demo-video" },
-    "kpi": { "label": "Download the Prospecting KPI Tracker", "href": "/resources#kpi-tracker" },
-    "foundingTeam": { "label": "Join the Founding Team Program", "href": "/demo?cta=founding-team" },
-    "bookDemoShort": { "label": "Book a Demo", "href": "/demo?cta=software-demo" }
+    "strategyCall": {
+      "label": "Book a Free Strategy Call",
+      "href": "/demo?cta=strategy-call"
+    },
+    "strategyCallLong": {
+      "label": "Book a Free Prospecting Strategy Call",
+      "href": "/demo?cta=strategy-call"
+    },
+    "demo": {
+      "label": "Request a Software Demo",
+      "href": "/demo?cta=software-demo"
+    },
+    "audit": {
+      "label": "Get a Free Prospecting System Audit",
+      "href": "/demo?cta=system-audit"
+    },
+    "seeSoftware": {
+      "label": "See the Software",
+      "href": "/software"
+    },
+    "seeCrm": {
+      "label": "See How the CRM Works",
+      "href": "/software"
+    },
+    "watchDemo": {
+      "label": "Watch Demo",
+      "href": "/software#demo-video"
+    },
+    "kpi": {
+      "label": "Download the Prospecting KPI Tracker",
+      "href": "/resources#kpi-tracker"
+    },
+    "foundingTeam": {
+      "label": "Join the Founding Team Program",
+      "href": "/demo?cta=founding-team"
+    },
+    "bookDemoShort": {
+      "label": "Book a Demo",
+      "href": "/demo?cta=software-demo"
+    }
   },
-
   "nav": [
-    { "label": "Home", "href": "/" },
-    { "label": "Software", "href": "/software" },
-    { "label": "Consulting", "href": "/consulting" },
-    { "label": "How It Works", "href": "/how-it-works" },
-    { "label": "About the Founder", "href": "/about" },
-    { "label": "Resources", "href": "/resources" },
-    { "label": "Pricing", "href": "/pricing" },
-    { "label": "Contact", "href": "/contact" }
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "Software",
+      "href": "/software"
+    },
+    {
+      "label": "Consulting",
+      "href": "/consulting"
+    },
+    {
+      "label": "How It Works",
+      "href": "/how-it-works"
+    },
+    {
+      "label": "About the Founder",
+      "href": "/about"
+    },
+    {
+      "label": "Resources",
+      "href": "/resources"
+    },
+    {
+      "label": "Pricing",
+      "href": "/pricing"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
   ],
-  "headerCta": { "label": "Book a Demo", "href": "/demo?cta=software-demo" },
-
+  "headerCta": {
+    "label": "Book a Demo",
+    "href": "/demo?cta=software-demo"
+  },
   "footer": {
     "columns": [
-      { "title": "Platform", "links": [ { "label": "Software", "href": "/software" }, { "label": "How It Works", "href": "/how-it-works" }, { "label": "Pricing", "href": "/pricing" }, { "label": "Book a Demo", "href": "/demo?cta=software-demo" } ] },
-      { "title": "Company", "links": [ { "label": "Consulting", "href": "/consulting" }, { "label": "About the Founder", "href": "/about" }, { "label": "Resources", "href": "/resources" }, { "label": "Contact", "href": "/contact" } ] }
+      {
+        "title": "Platform",
+        "links": [
+          {
+            "label": "Software",
+            "href": "/software"
+          },
+          {
+            "label": "How It Works",
+            "href": "/how-it-works"
+          },
+          {
+            "label": "Pricing",
+            "href": "/pricing"
+          },
+          {
+            "label": "Book a Demo",
+            "href": "/demo?cta=software-demo"
+          }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          {
+            "label": "Consulting",
+            "href": "/consulting"
+          },
+          {
+            "label": "About the Founder",
+            "href": "/about"
+          },
+          {
+            "label": "Resources",
+            "href": "/resources"
+          },
+          {
+            "label": "Contact",
+            "href": "/contact"
+          }
+        ]
+      }
     ],
-    "legal": [ { "label": "Privacy Policy", "href": "/privacy" }, { "label": "Terms of Service", "href": "/terms" } ],
+    "legal": [
+      {
+        "label": "Privacy Policy",
+        "href": "/privacy"
+      },
+      {
+        "label": "Terms of Service",
+        "href": "/terms"
+      }
+    ],
     "disclaimer": "Results vary and depend on effort, market conditions, lead quality, and follow-up.",
     "providerNote": "Phone, texting, AI usage, lead data, hosting, and other third-party provider fees may be billed separately."
   },
-
   "mockupNote": "Illustration with sample data",
-
   "pages": {
     "home": {
-      "seo": { "title": "Prospecting Call Tracker — Prospecting CRM & Consulting for Real Estate Teams", "description": "Prospecting-first CRM, systems and consulting for real estate agents and teams. Work your lists, track every call and follow-up, coach your team, and see which lead sources actually produce listings." },
+      "seo": {
+        "title": "Prospecting Call Tracker — Prospecting CRM & Consulting for Real Estate Teams",
+        "description": "Prospecting-first CRM, systems and consulting for real estate agents and teams. Work your lists, track every call and follow-up, coach your team, and see which lead sources actually produce listings."
+      },
       "hero": {
         "eyebrow": "Prospecting software + consulting for real estate",
         "title": "Turn More Prospecting Conversations Into Listings.",
         "subtitle": "Prospecting Call Tracker gives real estate agents and teams the software, systems, consulting, and accountability needed to work leads consistently, reduce wasted lead costs, and create more opportunities.",
-        "ctas": ["strategyCall", "seeSoftware", "watchDemo"],
-        "points": ["Built by a working agent and team leader", "Prospecting lists, dialer, texting and email in one place", "AI drafts — a person always approves before anything is sent"]
+        "ctas": [
+          "strategyCall",
+          "seeSoftware",
+          "watchDemo"
+        ],
+        "points": [
+          "Built by a working agent and team leader",
+          "Prospecting lists, dialer, texting and email in one place",
+          "AI drafts — a person always approves before anything is sent"
+        ]
       },
       "audience": {
         "title": "Built for the people who actually pick up the phone",
-        "items": ["Individual agents", "New agents", "Experienced agents cutting lead costs", "Team leaders", "Inside sales agents", "Brokerages", "Mortgage teams & lenders"]
+        "items": [
+          "Individual agents",
+          "New agents",
+          "Experienced agents cutting lead costs",
+          "Team leaders",
+          "Inside sales agents",
+          "Brokerages",
+          "Mortgage teams & lenders"
+        ]
       },
       "leadTypes": {
         "title": "Made for the lists you already prospect",
-        "items": ["Probate & inherited", "Absentee owners", "Vacant homes", "High-equity owners", "Expired listings", "FSBOs", "Pre-foreclosure", "Divorce", "Circle prospecting", "Past clients & sphere"]
+        "items": [
+          "Probate & inherited",
+          "Absentee owners",
+          "Vacant homes",
+          "High-equity owners",
+          "Expired listings",
+          "FSBOs",
+          "Pre-foreclosure",
+          "Divorce",
+          "Circle prospecting",
+          "Past clients & sphere"
+        ]
       },
       "problem": {
         "eyebrow": "The real problem",
         "title": "Most Agents Do Not Have a Lead Problem. They Have a Follow-Up and System Problem.",
         "intro": "The contacts are usually already there — in a spreadsheet, a dialer export, a sticky note, or an app nobody opens. What's missing is a system that makes the next call obvious and keeps everyone accountable.",
         "items": [
-          { "title": "Paying too much for online leads", "text": "Portal and pay-per-lead costs keep climbing while the same homeowners get five calls in five minutes." },
-          { "title": "Losing leads in spreadsheets", "text": "Lists get copied, sorted, and emailed around until nobody knows which version is current." },
-          { "title": "Agents failing to follow up", "text": "Most conversations need more than one touch, and the second and third touches are the ones that get skipped." },
-          { "title": "No accountability for calls and conversations", "text": "Leaders hear “I made my calls” but can't see dials, conversations, or appointments in one place." },
-          { "title": "No organized list assignment", "text": "Two agents call the same owner, or a great list sits untouched because no one owns it." },
-          { "title": "No clear daily prospecting plan", "text": "Agents sit down to prospect and spend the first hour deciding who to call." },
-          { "title": "No way to measure which lead sources produce listings", "text": "Without tracking from first call to closing, every source looks the same on a spreadsheet." },
-          { "title": "Too many disconnected tools", "text": "A dialer here, a texting app there, a CRM no one updates — and the history of each lead is spread across all of them." }
+          {
+            "title": "Paying too much for online leads",
+            "text": "Portal and pay-per-lead costs keep climbing while the same homeowners get five calls in five minutes."
+          },
+          {
+            "title": "Losing leads in spreadsheets",
+            "text": "Lists get copied, sorted, and emailed around until nobody knows which version is current."
+          },
+          {
+            "title": "Agents failing to follow up",
+            "text": "Most conversations need more than one touch, and the second and third touches are the ones that get skipped."
+          },
+          {
+            "title": "No accountability for calls and conversations",
+            "text": "Leaders hear “I made my calls” but can't see dials, conversations, or appointments in one place."
+          },
+          {
+            "title": "No organized list assignment",
+            "text": "Two agents call the same owner, or a great list sits untouched because no one owns it."
+          },
+          {
+            "title": "No clear daily prospecting plan",
+            "text": "Agents sit down to prospect and spend the first hour deciding who to call."
+          },
+          {
+            "title": "No way to measure which lead sources produce listings",
+            "text": "Without tracking from first call to closing, every source looks the same on a spreadsheet."
+          },
+          {
+            "title": "Too many disconnected tools",
+            "text": "A dialer here, a texting app there, a CRM no one updates — and the history of each lead is spread across all of them."
+          }
         ]
       },
       "solution": {
@@ -151,19 +385,47 @@
           {
             "title": "Prospecting Call Tracker Software",
             "text": "A prospecting-first CRM your agents can work from every day.",
-            "items": ["Upload and organize prospecting lists", "Assign lists and leads to agents", "Track calls, texts, notes, outcomes, and follow-ups", "CRM pipeline and opportunity tracking", "Team KPI scoreboard", "Lead ownership and permissions", "AI-assisted drafts and next-step suggestions", "Smart follow-up plans", "Built for mobile and desktop"],
+            "items": [
+              "Upload and organize prospecting lists",
+              "Assign lists and leads to agents",
+              "Track calls, texts, notes, outcomes, and follow-ups",
+              "CRM pipeline and opportunity tracking",
+              "Team KPI scoreboard",
+              "Lead ownership and permissions",
+              "AI-assisted drafts and next-step suggestions",
+              "Smart follow-up plans",
+              "Built for mobile and desktop"
+            ],
             "cta": "seeCrm"
           },
           {
             "title": "Prospecting Consulting",
             "text": "Hands-on help building the routine, standards, and accountability behind the software.",
-            "items": ["Build a daily prospecting routine", "Improve cold-calling and follow-up systems", "Create team standards and accountability", "Set up lead sources and campaigns", "Improve team conversion and activity", "Create scripts, templates, and follow-up plans", "Help teams spend less on low-quality leads", "Help leaders track real return on investment"],
+            "items": [
+              "Build a daily prospecting routine",
+              "Improve cold-calling and follow-up systems",
+              "Create team standards and accountability",
+              "Set up lead sources and campaigns",
+              "Improve team conversion and activity",
+              "Create scripts, templates, and follow-up plans",
+              "Help teams spend less on low-quality leads",
+              "Help leaders track real return on investment"
+            ],
             "cta": "strategyCall"
           },
           {
             "title": "Lead Generation Systems",
             "text": "Outbound strategies built around property data you can afford.",
-            "items": ["Prospecting list strategy", "Circle prospecting systems", "Probate and inherited property outreach", "Absentee and vacant-property outreach", "High-equity and likely-to-move lead systems", "Open house follow-up", "Past-client and referral systems", "Affordable outbound lead-generation strategies"],
+            "items": [
+              "Prospecting list strategy",
+              "Circle prospecting systems",
+              "Probate and inherited property outreach",
+              "Absentee and vacant-property outreach",
+              "High-equity and likely-to-move lead systems",
+              "Open house follow-up",
+              "Past-client and referral systems",
+              "Affordable outbound lead-generation strategies"
+            ],
             "cta": "audit"
           }
         ]
@@ -172,9 +434,21 @@
         "eyebrow": "Inside the software",
         "title": "Everything a prospecting day needs, on one screen",
         "items": [
-          { "mockup": "leadCard", "title": "Know exactly who to call next", "text": "The current lead, their phone numbers, last attempt and notes — with Call and Text one tap away." },
-          { "mockup": "scoreboard", "title": "See the week at a glance", "text": "A weekly scoreboard counts calls, conversations and appointments per agent from the activity they log." },
-          { "mockup": "aiDraft", "title": "AI drafts, you decide", "text": "The AI assistant suggests texts, emails and next steps. Nothing is sent until a person reviews it and clicks Approve." }
+          {
+            "mockup": "leadCard",
+            "title": "Know exactly who to call next",
+            "text": "The current lead, their phone numbers, last attempt and notes — with Call and Text one tap away."
+          },
+          {
+            "mockup": "scoreboard",
+            "title": "See the week at a glance",
+            "text": "A weekly scoreboard counts calls, conversations and appointments per agent from the activity they log."
+          },
+          {
+            "mockup": "aiDraft",
+            "title": "AI drafts, you decide",
+            "text": "The AI assistant suggests texts, emails and next steps. Nothing is sent until a person reviews it and clicks Approve."
+          }
         ]
       },
       "steps": {
@@ -187,83 +461,288 @@
         "title": "Real results from real teams — coming soon",
         "intro": "We only publish results and quotes from real clients, with their permission. These spots are reserved for them.",
         "testimonials": [
-          { "quote": "Before Prospecting Call Tracker, our leads were spread across spreadsheets and different apps. Now our agents know exactly who to call, what follow-up is due, and how they are performing every day.", "name": "[Client name]", "role": "[Team leader, Brokerage — City, State]", "type": "Team leader testimonial", "placeholder": true },
-          { "quote": "[Add a real quote from an individual agent who uses the software.]", "name": "[Client name]", "role": "[Agent, Brokerage]", "type": "Software user testimonial", "placeholder": true },
-          { "quote": "[Add a real quote from a consulting client about the system you built together.]", "name": "[Client name]", "role": "[Role, Company]", "type": "Client testimonial", "placeholder": true }
+          {
+            "quote": "Before Prospecting Call Tracker, our leads were spread across spreadsheets and different apps. Now our agents know exactly who to call, what follow-up is due, and how they are performing every day.",
+            "name": "[Client name]",
+            "role": "[Team leader, Brokerage — City, State]",
+            "type": "Team leader testimonial",
+            "placeholder": true
+          },
+          {
+            "quote": "[Add a real quote from an individual agent who uses the software.]",
+            "name": "[Client name]",
+            "role": "[Agent, Brokerage]",
+            "type": "Software user testimonial",
+            "placeholder": true
+          },
+          {
+            "quote": "[Add a real quote from a consulting client about the system you built together.]",
+            "name": "[Client name]",
+            "role": "[Role, Company]",
+            "type": "Client testimonial",
+            "placeholder": true
+          }
         ],
         "metrics": [
-          { "label": "Calls completed", "value": "", "note": "[Add a real, verifiable number]" },
-          { "label": "Appointments set", "value": "", "note": "[Add a real, verifiable number]" },
-          { "label": "Listings won", "value": "", "note": "[Add a real, verifiable number]" },
-          { "label": "Lead-cost savings", "value": "", "note": "[Add a real before-and-after result]" }
+          {
+            "label": "Calls completed",
+            "value": "",
+            "note": "[Add a real, verifiable number]"
+          },
+          {
+            "label": "Appointments set",
+            "value": "",
+            "note": "[Add a real, verifiable number]"
+          },
+          {
+            "label": "Listings won",
+            "value": "",
+            "note": "[Add a real, verifiable number]"
+          },
+          {
+            "label": "Lead-cost savings",
+            "value": "",
+            "note": "[Add a real before-and-after result]"
+          }
         ],
-        "caseStudy": { "title": "Before-and-after case study", "text": "[Placeholder — describe a real client's starting point, what changed in their system, and their results, with their permission.]" }
+        "caseStudy": {
+          "title": "Before-and-after case study",
+          "text": "[Placeholder — describe a real client's starting point, what changed in their system, and their results, with their permission.]"
+        }
       },
       "faq": {
         "title": "Common questions",
         "items": [
-          { "q": "Is Prospecting Call Tracker a CRM or a consulting company?", "a": "Both. The software is a prospecting-first CRM for real estate agents and teams. The consulting side helps you build the routine, standards, scripts and follow-up plans that make the software pay off. You can use either one, or both together." },
-          { "q": "Do I have to buy leads from you?", "a": "No. The system is built to work the property data and contacts you already have or choose to buy — probate, absentee, expired, FSBO, circle prospecting, past clients and more. We help you decide which lists are worth paying for." },
-          { "q": "Does the AI send messages on its own?", "a": "No. The AI assistant reads, drafts, ranks and summarizes. A person reviews every suggested text or email and clicks Approve before anything goes out. It never places calls or changes Do Not Call or consent settings." },
-          { "q": "Can agents see each other's leads?", "a": "Only if you allow it. Leads are assigned to agents, and team owners control who can see, edit, export or reassign leads through roles and permissions." },
-          { "q": "Do you guarantee more listings?", "a": "No one honestly can. Results vary and depend on effort, market conditions, lead quality, and follow-up. What we provide is the system, the tracking and the coaching to make consistent prospecting easier to do and easier to measure." }
+          {
+            "q": "Is Prospecting Call Tracker a CRM or a consulting company?",
+            "a": "Both. The software is a prospecting-first CRM for real estate agents and teams. The consulting side helps you build the routine, standards, scripts and follow-up plans that make the software pay off. You can use either one, or both together."
+          },
+          {
+            "q": "Do I have to buy leads from you?",
+            "a": "No. The system is built to work the property data and contacts you already have or choose to buy — probate, absentee, expired, FSBO, circle prospecting, past clients and more. We help you decide which lists are worth paying for."
+          },
+          {
+            "q": "Does the AI send messages on its own?",
+            "a": "No. The AI assistant reads, drafts, ranks and summarizes. A person reviews every suggested text or email and clicks Approve before anything goes out. It never places calls or changes Do Not Call or consent settings."
+          },
+          {
+            "q": "Can agents see each other's leads?",
+            "a": "Only if you allow it. Leads are assigned to agents, and team owners control who can see, edit, export or reassign leads through roles and permissions."
+          },
+          {
+            "q": "Do you guarantee more listings?",
+            "a": "No one honestly can. Results vary and depend on effort, market conditions, lead quality, and follow-up. What we provide is the system, the tracking and the coaching to make consistent prospecting easier to do and easier to measure."
+          }
         ]
       },
-      "finalCta": { "title": "Ready to build a prospecting system your team will use?", "text": "Book a free strategy call. We'll look at your lead sources, your follow-up and your team's activity, and show you where the system can help.", "ctas": ["strategyCallLong", "demo"] }
+      "finalCta": {
+        "title": "Ready to build a prospecting system your team will use?",
+        "text": "Book a free strategy call. We'll look at your lead sources, your follow-up and your team's activity, and show you where the system can help.",
+        "ctas": [
+          "strategyCallLong",
+          "demo"
+        ]
+      }
     },
-
     "software": {
-      "seo": { "title": "Prospecting CRM Software for Real Estate Teams — Prospecting Call Tracker", "description": "Prospecting lists, lead assignment, dialer and call tracking, texting, Email Center with Smart Plans, an AI assistant that drafts but never sends without approval, pipeline, follow-up queue, scoreboards, KPIs and lead-source ROI." },
+      "seo": {
+        "title": "Prospecting CRM Software for Real Estate Teams — Prospecting Call Tracker",
+        "description": "Prospecting lists, lead assignment, dialer and call tracking, texting, Email Center with Smart Plans, an AI assistant that drafts but never sends without approval, pipeline, follow-up queue, scoreboards, KPIs and lead-source ROI."
+      },
       "hero": {
         "eyebrow": "The software",
         "title": "A prospecting-first CRM built around the daily call session.",
         "subtitle": "Most CRMs are built to store contacts. Prospecting Call Tracker is built to work them — list by list, call by call, follow-up by follow-up — while leaders see what's actually happening.",
-        "ctas": ["demo", "watchDemo"]
+        "ctas": [
+          "demo",
+          "watchDemo"
+        ]
       },
-      "videoSection": { "title": "Watch the walkthrough", "text": "A short tour of a prospecting session, from opening a list to logging the outcome and scheduling the follow-up." },
-      "screenshotsSection": { "title": "Screens from the CRM", "text": "Real screenshots of the software go here." },
+      "videoSection": {
+        "title": "Watch the walkthrough",
+        "text": "A short tour of a prospecting session, from opening a list to logging the outcome and scheduling the follow-up."
+      },
+      "screenshotsSection": {
+        "title": "Screens from the CRM",
+        "text": "Real screenshots of the software go here."
+      },
       "features": [
-        { "id": "prospecting-lists", "mockup": "listImport", "title": "Prospecting Lists", "benefit": "Stop working from spreadsheets.", "text": "Upload CSV or Excel lists from your data provider, map the columns once and save the mapping for next time. Organize leads by list — probate, absentee, expired, FSBO, circle — with statuses, tags and custom fields. Sort Data helps you find, sort, move and copy leads across lists and teams." },
-        { "id": "lead-assignment", "mockup": "assignment", "title": "Lead Assignment and Data Protection", "benefit": "Every lead has an owner, and your data stays yours.", "text": "Assign whole lists or individual leads to one or more agents. With agent data isolation turned on, agents see only the leads assigned to them, while team leaders see their team. Viewing phone numbers, exporting and reassigning are permissions you control." },
-        { "id": "dialer", "mockup": "dialer", "title": "Dialer and Call Tracking", "benefit": "More dials, less clicking.", "text": "Work a list from the call queue: the next lead loads with their numbers, history and notes. Log the outcome in one tap and every call is counted toward the agent's activity. Connect your own phone provider for in-browser calling, or tap-to-call from your phone." },
-        { "id": "texting", "mockup": "texting", "title": "Text Messaging Workspace", "benefit": "Keep every text conversation with the lead it belongs to.", "text": "Two-way texting in a shared inbox tied to each lead. Opt-out words like STOP are handled automatically, consent is tracked per number, and sending windows keep messages within the hours you set. Requires your own texting provider account." },
-        { "id": "email-center", "mockup": "emailCenter", "title": "Email Follow-Up Center", "benefit": "Professional email follow-up without another tool.", "text": "Send and receive email from the CRM with a template library, campaigns to a list or segment, and analytics for deliveries, opens, clicks and replies. Replies land in the lead's thread, and unsubscribes are honored automatically." },
-        { "id": "smart-plans", "mockup": "smartPlan", "title": "Smart Plans and Automated Follow-Ups", "benefit": "The second, third and tenth touch actually happen.", "text": "Build step-by-step follow-up plans — email, wait, call task, text task — and enroll leads by hand or by rule. Ready-made starting points include probate, new seller, open house and past-client plans. Plans stop when a lead replies or unsubscribes." },
-        { "id": "ai-assistant", "mockup": "aiDraft", "title": "AI Prospecting Assistant", "benefit": "A second set of hands that never acts on its own.", "text": "The assistant drafts texts and emails, summarizes a lead's history, and suggests next steps. It only sees what the signed-in person is allowed to see. Every suggestion waits for a person to review and click Approve — it never sends messages, places calls, or changes consent. Uses your own AI provider account, with an on/off switch and a budget." },
-        { "id": "pipeline", "mockup": "pipeline", "title": "CRM Pipeline", "benefit": "See every opportunity from first conversation to closing.", "text": "Move deals through seller and buyer pipeline stages you define, with deal values, assigned agents and history. Pipelines can be set per team." },
-        { "id": "follow-up-queue", "mockup": "followups", "title": "Follow-Up Queue", "benefit": "Today's follow-ups, in order, every morning.", "text": "One list of what's due today and what's overdue — follow-ups, call tasks and text tasks from Smart Plans — so agents start the day knowing exactly who to contact." },
-        { "id": "scoreboard", "mockup": "scoreboard", "title": "Team Scoreboard", "benefit": "Friendly competition, based on real activity.", "text": "A weekly scoreboard ranks agents on points from calls, texts, door knocks, conversations and appointments. You choose the point values and the weekly goal." },
-        { "id": "agent-kpis", "mockup": "kpis", "title": "Agent KPIs", "benefit": "Coach on numbers, not feelings.", "text": "Per-agent dials, conversations, appointments and conversion rates over the week or month, compared with the period before." },
-        { "id": "lead-source-roi", "mockup": "roi", "title": "Lead Source ROI Tracking", "benefit": "Know which lists are worth paying for.", "text": "Compare lead sources by contacts, conversations, appointments, deals and dollars, so you can put your budget behind the sources that produce listings for your team." },
-        { "id": "roles-permissions", "mockup": "permissions", "title": "Team Roles and Permissions", "benefit": "Give everyone exactly the access they need.", "text": "Owner, administrator, team leader and agent roles with fine-grained permissions. Team panels keep each team's leads, lists, settings and reports separate, while the Owner sees the whole company." },
-        { "id": "coaching", "mockup": "coaching", "title": "Reporting and Coaching Dashboard", "benefit": "Run your weekly meeting from one screen.", "text": "The team dashboard brings together activity, follow-up completion, pipeline and scoreboard trends so leaders can spot who needs help and celebrate who's improving." }
+        {
+          "id": "prospecting-lists",
+          "mockup": "listImport",
+          "title": "Prospecting Lists",
+          "benefit": "Stop working from spreadsheets.",
+          "text": "Upload CSV or Excel lists from your data provider, map the columns once and save the mapping for next time. Organize leads by list — probate, absentee, expired, FSBO, circle — with statuses, tags and custom fields. Sort Data helps you find, sort, move and copy leads across lists and teams."
+        },
+        {
+          "id": "lead-assignment",
+          "mockup": "assignment",
+          "title": "Lead Assignment and Data Protection",
+          "benefit": "Every lead has an owner, and your data stays yours.",
+          "text": "Assign whole lists or individual leads to one or more agents. With agent data isolation turned on, agents see only the leads assigned to them, while team leaders see their team. Viewing phone numbers, exporting and reassigning are permissions you control."
+        },
+        {
+          "id": "dialer",
+          "mockup": "dialer",
+          "title": "Dialer and Call Tracking",
+          "benefit": "More dials, less clicking.",
+          "text": "Work a list from the call queue: the next lead loads with their numbers, history and notes. Log the outcome in one tap and every call is counted toward the agent's activity. Connect your own phone provider for in-browser calling, or tap-to-call from your phone."
+        },
+        {
+          "id": "texting",
+          "mockup": "texting",
+          "title": "Text Messaging Workspace",
+          "benefit": "Keep every text conversation with the lead it belongs to.",
+          "text": "Two-way texting in a shared inbox tied to each lead. Opt-out words like STOP are handled automatically, consent is tracked per number, and sending windows keep messages within the hours you set. Requires your own texting provider account."
+        },
+        {
+          "id": "email-center",
+          "mockup": "emailCenter",
+          "title": "Email Follow-Up Center",
+          "benefit": "Professional email follow-up without another tool.",
+          "text": "Send and receive email from the CRM with a template library, campaigns to a list or segment, and analytics for deliveries, opens, clicks and replies. Replies land in the lead's thread, and unsubscribes are honored automatically."
+        },
+        {
+          "id": "smart-plans",
+          "mockup": "smartPlan",
+          "title": "Smart Plans and Automated Follow-Ups",
+          "benefit": "The second, third and tenth touch actually happen.",
+          "text": "Build step-by-step follow-up plans — email, wait, call task, text task — and enroll leads by hand or by rule. Ready-made starting points include probate, new seller, open house and past-client plans. Plans stop when a lead replies or unsubscribes."
+        },
+        {
+          "id": "ai-assistant",
+          "mockup": "aiDraft",
+          "title": "AI Prospecting Assistant",
+          "benefit": "A second set of hands that never acts on its own.",
+          "text": "The assistant drafts texts and emails, summarizes a lead's history, and suggests next steps. It only sees what the signed-in person is allowed to see. Every suggestion waits for a person to review and click Approve — it never sends messages, places calls, or changes consent. Uses your own AI provider account, with an on/off switch and a budget."
+        },
+        {
+          "id": "pipeline",
+          "mockup": "pipeline",
+          "title": "CRM Pipeline",
+          "benefit": "See every opportunity from first conversation to closing.",
+          "text": "Move deals through seller and buyer pipeline stages you define, with deal values, assigned agents and history. Pipelines can be set per team."
+        },
+        {
+          "id": "follow-up-queue",
+          "mockup": "followups",
+          "title": "Follow-Up Queue",
+          "benefit": "Today's follow-ups, in order, every morning.",
+          "text": "One list of what's due today and what's overdue — follow-ups, call tasks and text tasks from Smart Plans — so agents start the day knowing exactly who to contact."
+        },
+        {
+          "id": "scoreboard",
+          "mockup": "scoreboard",
+          "title": "Team Scoreboard",
+          "benefit": "Friendly competition, based on real activity.",
+          "text": "A weekly scoreboard ranks agents on points from calls, texts, door knocks, conversations and appointments. You choose the point values and the weekly goal."
+        },
+        {
+          "id": "agent-kpis",
+          "mockup": "kpis",
+          "title": "Agent KPIs",
+          "benefit": "Coach on numbers, not feelings.",
+          "text": "Per-agent dials, conversations, appointments and conversion rates over the week or month, compared with the period before."
+        },
+        {
+          "id": "lead-source-roi",
+          "mockup": "roi",
+          "title": "Lead Source ROI Tracking",
+          "benefit": "Know which lists are worth paying for.",
+          "text": "Compare lead sources by contacts, conversations, appointments, deals and dollars, so you can put your budget behind the sources that produce listings for your team."
+        },
+        {
+          "id": "roles-permissions",
+          "mockup": "permissions",
+          "title": "Team Roles and Permissions",
+          "benefit": "Give everyone exactly the access they need.",
+          "text": "Owner, administrator, team leader and agent roles with fine-grained permissions. Team panels keep each team's leads, lists, settings and reports separate, while the Owner sees the whole company."
+        },
+        {
+          "id": "coaching",
+          "mockup": "coaching",
+          "title": "Reporting and Coaching Dashboard",
+          "benefit": "Run your weekly meeting from one screen.",
+          "text": "The team dashboard brings together activity, follow-up completion, pipeline and scoreboard trends so leaders can spot who needs help and celebrate who's improving."
+        }
       ],
-      "finalCta": { "title": "See it on your own lists", "text": "Book a demo and we'll walk through a real prospecting session — lists, dialer, follow-ups and scoreboard.", "ctas": ["demo", "strategyCall"] }
+      "finalCta": {
+        "title": "See it on your own lists",
+        "text": "Book a demo and we'll walk through a real prospecting session — lists, dialer, follow-ups and scoreboard.",
+        "ctas": [
+          "demo",
+          "strategyCall"
+        ]
+      }
     },
-
     "consulting": {
-      "seo": { "title": "Real Estate Prospecting Consulting & Team Systems — Prospecting Call Tracker", "description": "Prospecting consulting for real estate agents and teams: activity standards, calling structure, follow-up systems, scripts, KPI scorecards, list strategy and AI workflows." },
+      "seo": {
+        "title": "Real Estate Prospecting Consulting & Team Systems — Prospecting Call Tracker",
+        "description": "Prospecting consulting for real estate agents and teams: activity standards, calling structure, follow-up systems, scripts, KPI scorecards, list strategy and AI workflows."
+      },
       "hero": {
         "eyebrow": "Consulting",
         "title": "Build a Prospecting System Your Team Can Actually Follow.",
         "subtitle": "Consulting is for agents and teams that want help implementing a real outbound system — not just purchasing another software subscription. We work with you on the routine, the standards, the scripts and the tracking.",
-        "ctas": ["audit", "strategyCall"]
+        "ctas": [
+          "audit",
+          "strategyCall"
+        ]
       },
       "servicesTitle": "What we help you build",
       "services": [
-        { "title": "Prospecting business audit", "text": "A clear-eyed look at your lead sources, follow-up, activity and tools, and where opportunities are leaking." },
-        { "title": "Daily and weekly activity standards", "text": "Realistic call, conversation and appointment targets for each role on your team." },
-        { "title": "Team calling structure", "text": "Call blocks, power hours and list rotation so the team prospects together and consistently." },
-        { "title": "Lead-source planning", "text": "Decide which lists to buy, build or drop based on cost and what they produce." },
-        { "title": "Follow-up system setup", "text": "Follow-up cadences by lead type, so no conversation dies after one touch." },
-        { "title": "CRM workflow setup", "text": "Statuses, outcomes, pipelines and lists configured around how your team actually works." },
-        { "title": "Scripts and objection handling", "text": "Openers and responses for probate, expired, FSBO, absentee and circle calls, in your own voice." },
-        { "title": "Agent accountability", "text": "Simple check-ins and visibility so expectations are clear and progress is visible." },
-        { "title": "KPI scorecards", "text": "The handful of numbers each agent and leader should watch weekly." },
-        { "title": "List strategy and campaign planning", "text": "Which lists to call, text or email, in what order, and how often." },
-        { "title": "AI workflow setup", "text": "Practical prompts and approval habits for drafting messages and summarizing leads — safely." },
-        { "title": "Team leader coaching", "text": "Help running weekly meetings, one-on-ones and accountability conversations." },
-        { "title": "Cost-efficient lead-generation strategy", "text": "Build outbound pipelines that lean less on expensive pay-per-lead sources." }
+        {
+          "title": "Prospecting business audit",
+          "text": "A clear-eyed look at your lead sources, follow-up, activity and tools, and where opportunities are leaking."
+        },
+        {
+          "title": "Daily and weekly activity standards",
+          "text": "Realistic call, conversation and appointment targets for each role on your team."
+        },
+        {
+          "title": "Team calling structure",
+          "text": "Call blocks, power hours and list rotation so the team prospects together and consistently."
+        },
+        {
+          "title": "Lead-source planning",
+          "text": "Decide which lists to buy, build or drop based on cost and what they produce."
+        },
+        {
+          "title": "Follow-up system setup",
+          "text": "Follow-up cadences by lead type, so no conversation dies after one touch."
+        },
+        {
+          "title": "CRM workflow setup",
+          "text": "Statuses, outcomes, pipelines and lists configured around how your team actually works."
+        },
+        {
+          "title": "Scripts and objection handling",
+          "text": "Openers and responses for probate, expired, FSBO, absentee and circle calls, in your own voice."
+        },
+        {
+          "title": "Agent accountability",
+          "text": "Simple check-ins and visibility so expectations are clear and progress is visible."
+        },
+        {
+          "title": "KPI scorecards",
+          "text": "The handful of numbers each agent and leader should watch weekly."
+        },
+        {
+          "title": "List strategy and campaign planning",
+          "text": "Which lists to call, text or email, in what order, and how often."
+        },
+        {
+          "title": "AI workflow setup",
+          "text": "Practical prompts and approval habits for drafting messages and summarizing leads — safely."
+        },
+        {
+          "title": "Team leader coaching",
+          "text": "Help running weekly meetings, one-on-ones and accountability conversations."
+        },
+        {
+          "title": "Cost-efficient lead-generation strategy",
+          "text": "Build outbound pipelines that lean less on expensive pay-per-lead sources."
+        }
       ],
       "whoTitle": "Who this is for",
       "who": [
@@ -273,38 +752,107 @@
         "Teams using spreadsheets or multiple disconnected apps",
         "Agents who want a clear prospecting routine"
       ],
-      "notFor": { "title": "What consulting is not", "text": "It's not a promise of a number of listings, and it's not a done-for-you call center. Your team still makes the calls — we help make that work organized, measurable and easier to keep doing." },
+      "notFor": {
+        "title": "What consulting is not",
+        "text": "It's not a promise of a number of listings, and it's not a done-for-you call center. Your team still makes the calls — we help make that work organized, measurable and easier to keep doing."
+      },
       "faq": {
         "title": "Consulting questions",
         "items": [
-          { "q": "Do I need the software to work with you?", "a": "No. Consulting stands on its own. Many clients do use the software because it makes the standards and tracking we build together easier to keep." },
-          { "q": "Do you work with individual agents or only teams?", "a": "Both. Individual agents usually focus on a daily routine, list strategy and follow-up. Teams add calling structure, accountability and KPI scorecards." },
-          { "q": "How does it start?", "a": "With a free strategy call or a prospecting system audit. We look at what you're doing now and suggest a practical plan — no obligation." }
+          {
+            "q": "Do I need the software to work with you?",
+            "a": "No. Consulting stands on its own. Many clients do use the software because it makes the standards and tracking we build together easier to keep."
+          },
+          {
+            "q": "Do you work with individual agents or only teams?",
+            "a": "Both. Individual agents usually focus on a daily routine, list strategy and follow-up. Teams add calling structure, accountability and KPI scorecards."
+          },
+          {
+            "q": "How does it start?",
+            "a": "With a free strategy call or a prospecting system audit. We look at what you're doing now and suggest a practical plan — no obligation."
+          }
         ]
       },
-      "finalCta": { "title": "Start with a free prospecting system audit", "text": "Tell us about your lead sources, team and tools. We'll show you where your system can improve.", "ctas": ["audit", "strategyCallLong"] }
+      "finalCta": {
+        "title": "Start with a free prospecting system audit",
+        "text": "Tell us about your lead sources, team and tools. We'll show you where your system can improve.",
+        "ctas": [
+          "audit",
+          "strategyCallLong"
+        ]
+      }
     },
-
     "howItWorks": {
-      "seo": { "title": "How It Works — Prospecting Call Tracker", "description": "Four steps: assess your current prospecting system, build a custom plan, set up the software and workflows, then track activity and improve results." },
+      "seo": {
+        "title": "How It Works — Prospecting Call Tracker",
+        "description": "Four steps: assess your current prospecting system, build a custom plan, set up the software and workflows, then track activity and improve results."
+      },
       "hero": {
         "eyebrow": "How it works",
         "title": "A simple, four-step path to a prospecting system that sticks.",
         "subtitle": "Whether you start with the software, consulting or both, the process is the same: understand where you are, plan, set it up, then measure and improve.",
-        "ctas": ["strategyCall", "seeCrm"]
+        "ctas": [
+          "strategyCall",
+          "seeCrm"
+        ]
       },
       "steps": [
-        { "title": "Assess Your Current Prospecting System", "text": "We review your lead sources, follow-up process, team activity, technology, and biggest bottlenecks.", "details": ["Where your leads come from and what they cost", "How follow-up happens today (and where it stops)", "What your team tracks — and what it doesn't"] },
-        { "title": "Build Your Custom Prospecting Plan", "text": "We help create a practical plan around your goals, market, team size, budget, and lead types.", "details": ["Daily and weekly activity standards", "List and campaign priorities", "Scripts and follow-up cadences by lead type"] },
-        { "title": "Set Up the Software and Workflows", "text": "We organize lists, users, templates, Smart Plans, pipelines, reporting, and accountability systems.", "details": ["Import and assign your lists", "Roles, permissions and team panels", "Templates, Smart Plans and pipeline stages"] },
-        { "title": "Track Activity and Improve Results", "text": "Your team uses the system daily while leaders can measure calls, conversations, appointments, listings, and return on investment.", "details": ["Weekly scoreboard and agent KPIs", "Lead-source ROI", "Regular reviews to adjust the plan"] }
+        {
+          "title": "Assess Your Current Prospecting System",
+          "text": "We review your lead sources, follow-up process, team activity, technology, and biggest bottlenecks.",
+          "details": [
+            "Where your leads come from and what they cost",
+            "How follow-up happens today (and where it stops)",
+            "What your team tracks — and what it doesn't"
+          ]
+        },
+        {
+          "title": "Build Your Custom Prospecting Plan",
+          "text": "We help create a practical plan around your goals, market, team size, budget, and lead types.",
+          "details": [
+            "Daily and weekly activity standards",
+            "List and campaign priorities",
+            "Scripts and follow-up cadences by lead type"
+          ]
+        },
+        {
+          "title": "Set Up the Software and Workflows",
+          "text": "We organize lists, users, templates, Smart Plans, pipelines, reporting, and accountability systems.",
+          "details": [
+            "Import and assign your lists",
+            "Roles, permissions and team panels",
+            "Templates, Smart Plans and pipeline stages"
+          ]
+        },
+        {
+          "title": "Track Activity and Improve Results",
+          "text": "Your team uses the system daily while leaders can measure calls, conversations, appointments, listings, and return on investment.",
+          "details": [
+            "Weekly scoreboard and agent KPIs",
+            "Lead-source ROI",
+            "Regular reviews to adjust the plan"
+          ]
+        }
       ],
-      "finalCta": { "title": "Step one is a conversation", "text": "Book a free strategy call and we'll start with an honest look at your current system.", "ctas": ["strategyCallLong", "audit"] }
+      "finalCta": {
+        "title": "Step one is a conversation",
+        "text": "Book a free strategy call and we'll start with an honest look at your current system.",
+        "ctas": [
+          "strategyCallLong",
+          "audit"
+        ]
+      }
     },
-
     "about": {
-      "seo": { "title": "About the Founder — Prospecting Call Tracker", "description": "Prospecting Call Tracker was built by a real estate agent and team leader with more than seven years of experience in outbound prospecting, follow-up and team accountability." },
-      "hero": { "eyebrow": "About the founder", "title": "Built by an agent who grew his business on the phone.", "subtitle": "Not by depending only on expensive online leads — by cold calling, open houses, follow-up systems, direct outreach, property lists, team accountability and technology." },
+      "seo": {
+        "title": "About the Founder — Prospecting Call Tracker",
+        "description": "Prospecting Call Tracker was built by a real estate agent and team leader with more than seven years of experience in outbound prospecting, follow-up and team accountability."
+      },
+      "hero": {
+        "eyebrow": "About the founder",
+        "title": "Built by an agent who grew his business on the phone.",
+        "subtitle": "Not by depending only on expensive online leads — by cold calling, open houses, follow-up systems, direct outreach, property lists, team accountability and technology."
+      },
       "founderName": "",
       "founderTitle": "Founder, Prospecting Call Tracker · Real estate agent and team leader",
       "story": [
@@ -315,48 +863,226 @@
       "statsTitle": "By the numbers",
       "statsNote": "Placeholders — the founder fills these in with real, verifiable numbers.",
       "stats": [
-        { "label": "Years of experience", "value": "" },
-        { "label": "Transactions closed", "value": "" },
-        { "label": "Team production", "value": "" },
-        { "label": "Markets served", "value": "" },
-        { "label": "Prospecting systems built", "value": "" },
-        { "label": "Software and consulting experience", "value": "" }
+        {
+          "label": "Years of experience",
+          "value": ""
+        },
+        {
+          "label": "Transactions closed",
+          "value": ""
+        },
+        {
+          "label": "Team production",
+          "value": ""
+        },
+        {
+          "label": "Markets served",
+          "value": ""
+        },
+        {
+          "label": "Prospecting systems built",
+          "value": ""
+        },
+        {
+          "label": "Software and consulting experience",
+          "value": ""
+        }
       ],
       "valuesTitle": "What we believe",
       "values": [
-        { "title": "Consistency beats intensity", "text": "A daily call block you keep is worth more than a heroic weekend you don't repeat." },
-        { "title": "Follow-up is where business is made", "text": "Most opportunities come after the first conversation. Systems should make the next touch automatic." },
-        { "title": "Track what matters", "text": "Calls, conversations, appointments, listings and cost per source — not vanity metrics." },
-        { "title": "Technology serves people", "text": "Software and AI should save time and remove guesswork, while people stay in charge of every message and decision." }
+        {
+          "title": "Consistency beats intensity",
+          "text": "A daily call block you keep is worth more than a heroic weekend you don't repeat."
+        },
+        {
+          "title": "Follow-up is where business is made",
+          "text": "Most opportunities come after the first conversation. Systems should make the next touch automatic."
+        },
+        {
+          "title": "Track what matters",
+          "text": "Calls, conversations, appointments, listings and cost per source — not vanity metrics."
+        },
+        {
+          "title": "Technology serves people",
+          "text": "Software and AI should save time and remove guesswork, while people stay in charge of every message and decision."
+        }
       ],
-      "finalCta": { "title": "Talk with someone who's done the work", "text": "Book a free strategy call to talk about your market, your lists and your team.", "ctas": ["strategyCallLong", "demo"] }
+      "finalCta": {
+        "title": "Talk with someone who's done the work",
+        "text": "Book a free strategy call to talk about your market, your lists and your team.",
+        "ctas": [
+          "strategyCallLong",
+          "demo"
+        ]
+      }
     },
-
     "resources": {
-      "seo": { "title": "Prospecting Resources: Scripts, Templates, Checklists — Prospecting Call Tracker", "description": "Prospecting scripts, cold-calling tips, follow-up templates, AI prompt guides, team accountability guides, lead-generation articles, CRM workflow videos and downloadable checklists." },
-      "hero": { "eyebrow": "Resources", "title": "Practical tools for better prospecting habits.", "subtitle": "Scripts, templates, guides and checklists from real-world prospecting. New resources are added regularly.", "ctas": ["kpi"] },
+      "seo": {
+        "title": "Prospecting Resources: Scripts, Templates, Checklists — Prospecting Call Tracker",
+        "description": "Prospecting scripts, cold-calling tips, follow-up templates, AI prompt guides, team accountability guides, lead-generation articles, CRM workflow videos and downloadable checklists."
+      },
+      "hero": {
+        "eyebrow": "Resources",
+        "title": "Practical tools for better prospecting habits.",
+        "subtitle": "Scripts, templates, guides and checklists from real-world prospecting. New resources are added regularly.",
+        "ctas": [
+          "kpi"
+        ]
+      },
       "items": [
-        { "title": "Prospecting scripts", "text": "Openers and conversation flows for probate, expired, FSBO, absentee and circle prospecting calls.", "tag": "Scripts", "status": "Coming soon", "href": "" },
-        { "title": "Cold-calling tips", "text": "Call-block structure, tone, pacing and how to handle the first ten seconds.", "tag": "Guide", "status": "Coming soon", "href": "" },
-        { "title": "Follow-up templates", "text": "Text and email follow-ups by lead type, written to sound like a person, not a robot.", "tag": "Templates", "status": "Coming soon", "href": "" },
-        { "title": "AI prompt guides", "text": "Prompts for drafting messages, summarizing a lead's history and preparing for a call — with a human approval habit built in.", "tag": "Guide", "status": "Coming soon", "href": "" },
-        { "title": "Team accountability guides", "text": "How to set activity standards, run weekly scoreboard meetings and coach one-on-one.", "tag": "Guide", "status": "Coming soon", "href": "" },
-        { "title": "Lead-generation strategy articles", "text": "Choosing lists, comparing lead costs and building outbound systems that don't depend on portals.", "tag": "Articles", "status": "Coming soon", "href": "" },
-        { "title": "CRM workflow videos", "text": "Short walkthroughs of list imports, the call queue, Smart Plans and the scoreboard.", "tag": "Videos", "status": "Coming soon", "href": "" },
-        { "title": "Downloadable checklists", "text": "Daily prospecting checklist, list-import checklist and weekly team-meeting checklist.", "tag": "Checklists", "status": "Coming soon", "href": "" }
+        {
+          "title": "Prospecting scripts",
+          "text": "Openers and conversation flows for probate, expired, FSBO, absentee and circle prospecting calls.",
+          "tag": "Scripts",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "Cold-calling tips",
+          "text": "Call-block structure, tone, pacing and how to handle the first ten seconds.",
+          "tag": "Guide",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "Follow-up templates",
+          "text": "Text and email follow-ups by lead type, written to sound like a person, not a robot.",
+          "tag": "Templates",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "AI prompt guides",
+          "text": "Prompts for drafting messages, summarizing a lead's history and preparing for a call — with a human approval habit built in.",
+          "tag": "Guide",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "Team accountability guides",
+          "text": "How to set activity standards, run weekly scoreboard meetings and coach one-on-one.",
+          "tag": "Guide",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "Lead-generation strategy articles",
+          "text": "Choosing lists, comparing lead costs and building outbound systems that don't depend on portals.",
+          "tag": "Articles",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "CRM workflow videos",
+          "text": "Short walkthroughs of list imports, the call queue, Smart Plans and the scoreboard.",
+          "tag": "Videos",
+          "status": "Coming soon",
+          "href": ""
+        },
+        {
+          "title": "Downloadable checklists",
+          "text": "Daily prospecting checklist, list-import checklist and weekly team-meeting checklist.",
+          "tag": "Checklists",
+          "status": "Coming soon",
+          "href": ""
+        }
       ],
-      "kpi": { "title": "Download the Prospecting KPI Tracker", "text": "A simple weekly tracker for dials, conversations, appointments, listings taken and cost per lead source. Tell us where to send it.", "bullets": ["Weekly activity targets by role", "Conversion rates from dial to appointment", "Cost per lead source and per appointment"] }
+      "kpi": {
+        "title": "Download the Prospecting KPI Tracker",
+        "text": "A simple weekly tracker for dials, conversations, appointments, listings taken and cost per lead source. Tell us where to send it.",
+        "bullets": [
+          "Weekly activity targets by role",
+          "Conversion rates from dial to appointment",
+          "Cost per lead source and per appointment"
+        ]
+      }
     },
-
     "pricing": {
-      "seo": { "title": "Pricing — Prospecting Call Tracker", "description": "Software setup and license, team CRM packages, consulting and system setup, custom team buildouts and the Founding Team Offer. Contact us for current pricing." },
-      "hero": { "eyebrow": "Pricing", "title": "Packages for individual agents, teams and brokerages.", "subtitle": "Every team is different, so we confirm scope and pricing on a short call. Here's what each package includes." },
+      "seo": {
+        "title": "Pricing — Prospecting Call Tracker",
+        "description": "Software setup and license, team CRM packages, consulting and system setup, custom team buildouts and the Founding Team Offer. Contact us for current pricing."
+      },
+      "hero": {
+        "eyebrow": "Pricing",
+        "title": "Packages for individual agents, teams and brokerages.",
+        "subtitle": "Every team is different, so we confirm scope and pricing on a short call. Here's what each package includes."
+      },
       "plans": [
-        { "name": "Software Setup and License", "price": "Contact for pricing", "priceNote": "[$___ setup + $___ / month]", "for": "For individual agents ready to prospect from one system.", "items": ["Prospecting CRM license", "List import and column mapping", "Dialer, texting and email workspaces*", "Follow-up queue and Smart Plans", "Personal KPI dashboard", "Onboarding session"], "cta": "demo" },
-        { "name": "Team CRM Package", "price": "Contact for pricing", "priceNote": "[$___ / month for up to ___ users]", "for": "For teams that need assignment, accountability and reporting.", "items": ["Everything in Software Setup and License", "Lead assignment and agent data isolation", "Roles, permissions and team panels", "Weekly team scoreboard and agent KPIs", "Lead-source ROI tracking", "Team onboarding"], "cta": "demo", "featured": true, "badge": "Most popular for teams" },
-        { "name": "Consulting and System Setup", "price": "Contact for pricing", "priceNote": "[$___ one-time or $___ / month]", "for": "For agents and teams who want help building the system itself.", "items": ["Prospecting business audit", "Activity standards and calling structure", "Scripts and follow-up plans", "CRM workflow setup", "KPI scorecards", "Coaching sessions [number to be confirmed]"], "cta": "strategyCall" },
-        { "name": "Custom Team Buildout", "price": "Custom quote", "priceNote": "[Scoped per project]", "for": "For larger teams and brokerages with specific workflows.", "items": ["Multi-team setup and data migration", "Custom fields, pipelines and Smart Plans", "Team leader coaching", "Agreed configuration and reporting work", "Defined scope — no unlimited custom programming"], "cta": "strategyCall" },
-        { "name": "Founding Team Offer", "price": "Limited availability", "priceNote": "[Founding terms — $___]", "for": "For a small group of early teams who want to help shape the product.", "items": ["Founding pricing [terms to be confirmed]", "Direct access to the founder", "Input on the product roadmap", "Priority onboarding"], "cta": "foundingTeam", "id": "founding-team" }
+        {
+          "name": "Software Setup and License",
+          "price": "Contact for pricing",
+          "priceNote": "[$___ setup + $___ / month]",
+          "for": "For individual agents ready to prospect from one system.",
+          "items": [
+            "Prospecting CRM license",
+            "List import and column mapping",
+            "Dialer, texting and email workspaces*",
+            "Follow-up queue and Smart Plans",
+            "Personal KPI dashboard",
+            "Onboarding session"
+          ],
+          "cta": "demo"
+        },
+        {
+          "name": "Team CRM Package",
+          "price": "Contact for pricing",
+          "priceNote": "[$___ / month for up to ___ users]",
+          "for": "For teams that need assignment, accountability and reporting.",
+          "items": [
+            "Everything in Software Setup and License",
+            "Lead assignment and agent data isolation",
+            "Roles, permissions and team panels",
+            "Weekly team scoreboard and agent KPIs",
+            "Lead-source ROI tracking",
+            "Team onboarding"
+          ],
+          "cta": "demo",
+          "featured": true,
+          "badge": "Most popular for teams"
+        },
+        {
+          "name": "Consulting and System Setup",
+          "price": "Contact for pricing",
+          "priceNote": "[$___ one-time or $___ / month]",
+          "for": "For agents and teams who want help building the system itself.",
+          "items": [
+            "Prospecting business audit",
+            "Activity standards and calling structure",
+            "Scripts and follow-up plans",
+            "CRM workflow setup",
+            "KPI scorecards",
+            "Coaching sessions [number to be confirmed]"
+          ],
+          "cta": "strategyCall"
+        },
+        {
+          "name": "Custom Team Buildout",
+          "price": "Custom quote",
+          "priceNote": "[Scoped per project]",
+          "for": "For larger teams and brokerages with specific workflows.",
+          "items": [
+            "Multi-team setup and data migration",
+            "Custom fields, pipelines and Smart Plans",
+            "Team leader coaching",
+            "Agreed configuration and reporting work",
+            "Defined scope — no unlimited custom programming"
+          ],
+          "cta": "strategyCall"
+        },
+        {
+          "name": "Founding Team Offer",
+          "price": "Limited availability",
+          "priceNote": "[Founding terms — $___]",
+          "for": "For a small group of early teams who want to help shape the product.",
+          "items": [
+            "Founding pricing [terms to be confirmed]",
+            "Direct access to the founder",
+            "Input on the product roadmap",
+            "Priority onboarding"
+          ],
+          "cta": "foundingTeam",
+          "id": "founding-team"
+        }
       ],
       "footnotes": [
         "*Phone, texting, AI usage, lead data, hosting, and other third-party provider fees may be separate and are billed by those providers or passed through at cost.",
@@ -366,17 +1092,39 @@
       "faq": {
         "title": "Pricing questions",
         "items": [
-          { "q": "Why don't you list prices?", "a": "Pricing depends on team size, the setup work involved and which providers you connect. We'd rather give you an accurate number on a short call than a misleading one on a web page." },
-          { "q": "What costs are separate?", "a": "Phone calling, text messaging, AI usage, lead and property data, and some hosting costs come from third-party providers. Depending on your setup they're billed by those providers directly or passed through at cost. We'll go over them before you sign up." },
-          { "q": "Can you build custom features for my team?", "a": "We can scope specific configuration and development work and quote it in advance. Packages don't include unlimited custom programming." }
+          {
+            "q": "Why don't you list prices?",
+            "a": "Pricing depends on team size, the setup work involved and which providers you connect. We'd rather give you an accurate number on a short call than a misleading one on a web page."
+          },
+          {
+            "q": "What costs are separate?",
+            "a": "Phone calling, text messaging, AI usage, lead and property data, and some hosting costs come from third-party providers. Depending on your setup they're billed by those providers directly or passed through at cost. We'll go over them before you sign up."
+          },
+          {
+            "q": "Can you build custom features for my team?",
+            "a": "We can scope specific configuration and development work and quote it in advance. Packages don't include unlimited custom programming."
+          }
         ]
       },
-      "finalCta": { "title": "Not sure which package fits?", "text": "Book a free strategy call and we'll recommend the right starting point for your team.", "ctas": ["strategyCall", "demo"] }
+      "finalCta": {
+        "title": "Not sure which package fits?",
+        "text": "Book a free strategy call and we'll recommend the right starting point for your team.",
+        "ctas": [
+          "strategyCall",
+          "demo"
+        ]
+      }
     },
-
     "demo": {
-      "seo": { "title": "Book a Demo or Free Strategy Call — Prospecting Call Tracker", "description": "Request a software demo, a free prospecting strategy call, a free prospecting system audit, or join the Founding Team Program." },
-      "hero": { "eyebrow": "Book a demo", "title": "Let's look at your prospecting system together.", "subtitle": "Tell us a little about you and your team. We'll reach out to schedule a time — no pressure, no obligation." },
+      "seo": {
+        "title": "Book a Demo or Free Strategy Call — Prospecting Call Tracker",
+        "description": "Request a software demo, a free prospecting strategy call, a free prospecting system audit, or join the Founding Team Program."
+      },
+      "hero": {
+        "eyebrow": "Book a demo",
+        "title": "Let's look at your prospecting system together.",
+        "subtitle": "Tell us a little about you and your team. We'll reach out to schedule a time — no pressure, no obligation."
+      },
       "expectTitle": "What to expect",
       "expect": [
         "A 20–30 minute conversation about your lead sources, follow-up and team",
@@ -385,64 +1133,191 @@
       ],
       "formTitle": "Tell us about your team"
     },
-
     "contact": {
-      "seo": { "title": "Contact — Prospecting Call Tracker", "description": "Questions about the software, consulting or pricing? Contact Prospecting Call Tracker." },
-      "hero": { "eyebrow": "Contact", "title": "Questions? We're happy to help.", "subtitle": "Ask about the software, consulting, pricing or partnerships. For a demo or strategy call, the booking form is the fastest way." },
+      "seo": {
+        "title": "Contact — Prospecting Call Tracker",
+        "description": "Questions about the software, consulting or pricing? Contact Prospecting Call Tracker."
+      },
+      "hero": {
+        "eyebrow": "Contact",
+        "title": "Questions? We're happy to help.",
+        "subtitle": "Ask about the software, consulting, pricing or partnerships. For a demo or strategy call, the booking form is the fastest way."
+      },
       "formTitle": "Send us a message"
     },
-
     "thankYou": {
-      "seo": { "title": "Thank You — Prospecting Call Tracker", "description": "Thanks for reaching out to Prospecting Call Tracker." },
+      "seo": {
+        "title": "Thank You — Prospecting Call Tracker",
+        "description": "Thanks for reaching out to Prospecting Call Tracker."
+      },
       "title": "Thanks — we received your request.",
       "text": "We'll reach out soon. In the meantime, take a look at how the software works.",
-      "ctas": ["seeSoftware", "kpi"]
+      "ctas": [
+        "seeSoftware",
+        "kpi"
+      ]
     },
-
     "notFound": {
-      "seo": { "title": "Page Not Found — Prospecting Call Tracker", "description": "The page you were looking for doesn't exist. Explore Prospecting Call Tracker software, consulting, pricing and resources instead." },
+      "seo": {
+        "title": "Page Not Found — Prospecting Call Tracker",
+        "description": "The page you were looking for doesn't exist. Explore Prospecting Call Tracker software, consulting, pricing and resources instead."
+      },
       "title": "We couldn't find that page.",
       "text": "The link may be old or mistyped. Here are some good places to start.",
-      "ctas": ["seeSoftware", "strategyCall"]
+      "ctas": [
+        "seeSoftware",
+        "strategyCall"
+      ]
     },
-
     "privacy": {
-      "seo": { "title": "Privacy Policy — Prospecting Call Tracker", "description": "How Prospecting Call Tracker collects, uses and protects information." },
+      "seo": {
+        "title": "Privacy Policy — Prospecting Call Tracker",
+        "description": "How Prospecting Call Tracker collects, uses and protects information."
+      },
       "title": "Privacy Policy",
       "draftNote": "Draft — have your attorney review before relying on this policy.",
       "updated": "[Effective date]",
       "sections": [
-        { "h": "Who we are", "p": ["Prospecting Call Tracker (“we”, “us”) provides prospecting software and consulting services for real estate professionals. This policy explains what information we collect through this website and our services, how we use it, and the choices you have."] },
-        { "h": "Information you give us", "p": ["When you fill out a form on this website we collect what you enter: your name, email address, phone number, brokerage or team name, number of agents, current CRM, your prospecting challenges, which services you're interested in, and which page or button you came from.", "If you become a customer, we also process the information you and your team put into the software, such as lead lists, notes, call and message history. You control that data; we process it to provide the service."] },
-        { "h": "Information collected automatically", "p": ["Like most websites, our hosting provider records basic technical information such as IP address, browser type and pages visited, for security and reliability. If analytics are turned on, we use them to understand which pages are useful; we do not sell this information."] },
-        { "h": "How we use information", "p": ["To respond to your request, schedule demos and calls, provide and support our services, improve this website, keep our systems secure, and meet legal obligations."] },
-        { "h": "Calls, texts and emails", "p": ["If you check the consent box on a form, you agree that we may contact you about your request by phone call, text message and email. Message and data rates may apply. Consent is not a condition of purchase. You can opt out of texts at any time by replying STOP, and unsubscribe from emails using the link in any email. We record your consent and opt-outs and honor them."] },
-        { "h": "Service providers and fees", "p": ["We use third-party providers for hosting, databases, email delivery, phone calling, text messaging and AI features. They process information on our behalf under their own terms and security practices. Phone, text, AI, data and hosting provider fees may be separate from our fees."] },
-        { "h": "AI features", "p": ["Where AI features are used, information is sent to the AI provider only as needed to produce a draft or summary, and a person reviews AI suggestions before anything is sent."] },
-        { "h": "Sharing", "p": ["We don't sell your personal information. We share it only with service providers who help us operate, when required by law, or as part of a business transfer."] },
-        { "h": "Security and retention", "p": ["We use reasonable safeguards such as encryption in transit, access controls and audit logs. We keep information as long as needed for the purposes above or as required by law."] },
-        { "h": "Your choices", "p": ["You can ask us to access, correct or delete your information, or to stop contacting you, using the contact details on our Contact page. Depending on where you live you may have additional rights."] },
-        { "h": "Changes and contact", "p": ["We may update this policy and will change the effective date when we do. Questions? Reach us through the Contact page."] }
+        {
+          "h": "Who we are",
+          "p": [
+            "Prospecting Call Tracker (“we”, “us”) provides prospecting software and consulting services for real estate professionals. This policy explains what information we collect through this website and our services, how we use it, and the choices you have."
+          ]
+        },
+        {
+          "h": "Information you give us",
+          "p": [
+            "When you fill out a form on this website we collect what you enter: your name, email address, phone number, brokerage or team name, number of agents, current CRM, your prospecting challenges, which services you're interested in, and which page or button you came from.",
+            "If you become a customer, we also process the information you and your team put into the software, such as lead lists, notes, call and message history. You control that data; we process it to provide the service."
+          ]
+        },
+        {
+          "h": "Information collected automatically",
+          "p": [
+            "Like most websites, our hosting provider records basic technical information such as IP address, browser type and pages visited, for security and reliability. If analytics are turned on, we use them to understand which pages are useful; we do not sell this information."
+          ]
+        },
+        {
+          "h": "How we use information",
+          "p": [
+            "To respond to your request, schedule demos and calls, provide and support our services, improve this website, keep our systems secure, and meet legal obligations."
+          ]
+        },
+        {
+          "h": "Calls, texts and emails",
+          "p": [
+            "If you check the consent box on a form, you agree that we may contact you about your request by phone call, text message and email. Message and data rates may apply. Consent is not a condition of purchase. You can opt out of texts at any time by replying STOP, and unsubscribe from emails using the link in any email. We record your consent and opt-outs and honor them."
+          ]
+        },
+        {
+          "h": "Service providers and fees",
+          "p": [
+            "We use third-party providers for hosting, databases, email delivery, phone calling, text messaging and AI features. They process information on our behalf under their own terms and security practices. Phone, text, AI, data and hosting provider fees may be separate from our fees."
+          ]
+        },
+        {
+          "h": "AI features",
+          "p": [
+            "Where AI features are used, information is sent to the AI provider only as needed to produce a draft or summary, and a person reviews AI suggestions before anything is sent."
+          ]
+        },
+        {
+          "h": "Sharing",
+          "p": [
+            "We don't sell your personal information. We share it only with service providers who help us operate, when required by law, or as part of a business transfer."
+          ]
+        },
+        {
+          "h": "Security and retention",
+          "p": [
+            "We use reasonable safeguards such as encryption in transit, access controls and audit logs. We keep information as long as needed for the purposes above or as required by law."
+          ]
+        },
+        {
+          "h": "Your choices",
+          "p": [
+            "You can ask us to access, correct or delete your information, or to stop contacting you, using the contact details on our Contact page. Depending on where you live you may have additional rights."
+          ]
+        },
+        {
+          "h": "Changes and contact",
+          "p": [
+            "We may update this policy and will change the effective date when we do. Questions? Reach us through the Contact page."
+          ]
+        }
       ]
     },
-
     "terms": {
-      "seo": { "title": "Terms of Service — Prospecting Call Tracker", "description": "Terms for using the Prospecting Call Tracker website and services." },
+      "seo": {
+        "title": "Terms of Service — Prospecting Call Tracker",
+        "description": "Terms for using the Prospecting Call Tracker website and services."
+      },
       "title": "Terms of Service",
       "draftNote": "Draft — have your attorney review before relying on these terms.",
       "updated": "[Effective date]",
       "sections": [
-        { "h": "Agreement", "p": ["By using this website or our services you agree to these terms. If you sign a separate agreement with us, that agreement controls where it differs."] },
-        { "h": "Our services", "p": ["Prospecting Call Tracker provides prospecting software and consulting for real estate professionals. Features, packages and pricing may change; the scope of any paid engagement is set out in your order or agreement. Packages do not include unlimited custom programming; custom work is scoped and quoted in advance."] },
-        { "h": "No guaranteed results", "p": ["We provide software, systems, training and consulting. We do not guarantee leads, appointments, listings, closings, savings or income. Results vary and depend on effort, market conditions, lead quality, and follow-up."] },
-        { "h": "Third-party providers and fees", "p": ["Some features rely on providers you connect or that we use, such as phone, texting, email, AI, lead data and hosting providers. Their fees may be separate and their terms also apply."] },
-        { "h": "Your responsibilities: calling, texting and email", "p": ["You are responsible for how you use the software to contact people, including complying with telemarketing, texting and email laws (such as the TCPA, the Telephone Consumer Protection Act; Do Not Call rules; CAN-SPAM; and state laws), obtaining any required consent, scrubbing against Do Not Call lists, and honoring opt-outs. The software includes tools to help, but they don't replace your own compliance review."] },
-        { "h": "Your data", "p": ["You own the data you put into the software. You're responsible for having the right to upload and use it. We process it to provide the service as described in our Privacy Policy."] },
-        { "h": "Acceptable use", "p": ["Don't misuse the services: no unlawful, harassing or deceptive outreach, no attempts to break security, and no reselling without permission."] },
-        { "h": "AI features", "p": ["AI drafts and suggestions may be inaccurate. Review them before use; a person must approve any AI-drafted message before it is sent."] },
-        { "h": "Disclaimers and limits", "p": ["The website and services are provided “as is” to the extent the law allows. Our liability is limited to the amount you paid us in the twelve months before the claim, to the extent the law allows."] },
-        { "h": "Changes and contact", "p": ["We may update these terms and will change the effective date when we do. Questions? Reach us through the Contact page."] }
+        {
+          "h": "Agreement",
+          "p": [
+            "By using this website or our services you agree to these terms. If you sign a separate agreement with us, that agreement controls where it differs."
+          ]
+        },
+        {
+          "h": "Our services",
+          "p": [
+            "Prospecting Call Tracker provides prospecting software and consulting for real estate professionals. Features, packages and pricing may change; the scope of any paid engagement is set out in your order or agreement. Packages do not include unlimited custom programming; custom work is scoped and quoted in advance."
+          ]
+        },
+        {
+          "h": "No guaranteed results",
+          "p": [
+            "We provide software, systems, training and consulting. We do not guarantee leads, appointments, listings, closings, savings or income. Results vary and depend on effort, market conditions, lead quality, and follow-up."
+          ]
+        },
+        {
+          "h": "Third-party providers and fees",
+          "p": [
+            "Some features rely on providers you connect or that we use, such as phone, texting, email, AI, lead data and hosting providers. Their fees may be separate and their terms also apply."
+          ]
+        },
+        {
+          "h": "Your responsibilities: calling, texting and email",
+          "p": [
+            "You are responsible for how you use the software to contact people, including complying with telemarketing, texting and email laws (such as the TCPA, the Telephone Consumer Protection Act; Do Not Call rules; CAN-SPAM; and state laws), obtaining any required consent, scrubbing against Do Not Call lists, and honoring opt-outs. The software includes tools to help, but they don't replace your own compliance review."
+          ]
+        },
+        {
+          "h": "Your data",
+          "p": [
+            "You own the data you put into the software. You're responsible for having the right to upload and use it. We process it to provide the service as described in our Privacy Policy."
+          ]
+        },
+        {
+          "h": "Acceptable use",
+          "p": [
+            "Don't misuse the services: no unlawful, harassing or deceptive outreach, no attempts to break security, and no reselling without permission."
+          ]
+        },
+        {
+          "h": "AI features",
+          "p": [
+            "AI drafts and suggestions may be inaccurate. Review them before use; a person must approve any AI-drafted message before it is sent."
+          ]
+        },
+        {
+          "h": "Disclaimers and limits",
+          "p": [
+            "The website and services are provided “as is” to the extent the law allows. Our liability is limited to the amount you paid us in the twelve months before the claim, to the extent the law allows."
+          ]
+        },
+        {
+          "h": "Changes and contact",
+          "p": [
+            "We may update these terms and will change the effective date when we do. Questions? Reach us through the Contact page."
+          ]
+        }
       ]
     }
-  }
+  },
+  "customPages": []
 }

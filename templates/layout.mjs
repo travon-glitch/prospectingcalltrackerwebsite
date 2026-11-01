@@ -137,6 +137,16 @@ function clientConfig(site) {
   };
 }
 
+/** Brand colors chosen in the website editor (site.json → theme), written to /assets/theme.css by build.mjs. */
+export function themeCss(site) {
+  const t = site.theme ?? {};
+  const map = { accentColor: "--green", accentDarkColor: "--green-dark", darkColor: "--navy", darkColor2: "--navy-2", footerColor: "--footer" };
+  const rules = Object.entries(map)
+    .filter(([k]) => /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(t[k] ?? ""))
+    .map(([k, v]) => `${v}: ${t[k]};`);
+  return rules.length ? `:root { ${rules.join(" ")} }\n` : "";
+}
+
 const jsonScript = (obj, type = "application/ld+json", id = "") => `<script type="${type}"${id ? ` id="${id}"` : ""}>${JSON.stringify(obj).replace(/</g, "\\u003c")}</script>`;
 
 export function page(site, { path, seo, body, jsonLd = [], noindex = false, version }) {
@@ -186,6 +196,7 @@ ${site.site.twitterHandle ? `<meta name="twitter:site" content="${esc(site.site.
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 ${fonts ? `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="${esc(fonts)}">` : ""}
 <link rel="stylesheet" href="/assets/styles.css?v=${version}">
+${themeCss(site) ? `<link rel="stylesheet" href="/assets/theme.css?v=${version}">` : ""}
 <script src="/assets/site.js?v=${version}" defer></script>
 ${jsonScript(clientConfig(site), "application/json", "site-config")}
 ${[org, ...jsonLd].filter(Boolean).map((j) => jsonScript(j)).join("\n")}

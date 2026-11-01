@@ -399,8 +399,46 @@ function simple(site, key, path, file, noindex) {
   return { path, file, seo: p.seo, body, noindex };
 }
 
+/* ================================================================ Extra pages (added in the website editor) */
+
+const paragraphs = (text) =>
+  String(text ?? "")
+    .split(/\n\s*\n/)
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .map((t) => `<p>${esc(t).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+
+function customPage(site, cp, taken) {
+  const slug = String(cp.slug ?? "").trim().replace(/^\/+|\/+$/g, "");
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error(`site.json: extra page “${cp.title || "(untitled)"}” needs a web address made of lowercase letters, numbers and dashes, e.g. open-house-guide`);
+  if (taken.has("/" + slug)) throw new Error(`site.json: the web address /${slug} is already used by another page`);
+  taken.add("/" + slug);
+  const title = String(cp.title ?? "").trim() || slug;
+  const sections = (cp.sections ?? [])
+    .map((s, i) => {
+      const img = s.image?.src ? mediaImage({ src: s.image.src, alt: s.image.alt || title, caption: s.image.caption || "" }, { cls: "cp-image" }) : "";
+      const btn = s.button?.label && s.button?.href ? `<div class="cta-row">${button(site, { label: s.button.label, href: s.button.href }, i % 2 ? "secondary" : "primary")}</div>` : "";
+      if (!s.heading && !s.text && !img && !btn) return "";
+      return `<section class="section${i % 2 ? " bg-soft" : ""}"${s.heading ? ` aria-labelledby="cp-${i}"` : ""}>
+  <div class="container${img ? " two-col cp-split" : " narrow"}">
+    <div class="prose">${s.heading ? `<h2 id="cp-${i}">${esc(s.heading)}</h2>` : ""}${paragraphs(s.text)}${btn}</div>
+    ${img}
+  </div>
+</section>`;
+    })
+    .join("\n");
+  const hero = { eyebrow: cp.eyebrow, title, subtitle: cp.subtitle, ctas: (cp.heroButtons ?? []).filter((k) => site.ctas[k]) };
+  const description = cp.seo?.description || cp.subtitle || site.site.brandStatement;
+  const body = `
+${pageHero(site, hero, { compact: true })}
+${sections}
+${cp.showFinalCta === false ? "" : finalCta(site, site.pages.home.finalCta)}`;
+  return { path: "/" + slug, file: `${slug}.html`, seo: { title: cp.seo?.title || `${title} | ${site.site.name}`, description }, body };
+}
+
 export function allPages(site) {
-  return [
+  const pages = [
     home(site),
     software(site),
     consulting(site),
@@ -415,4 +453,7 @@ export function allPages(site) {
     simple(site, "thankYou", "/thank-you", "thank-you.html", true),
     simple(site, "notFound", "/404", "404.html", true),
   ];
+  const taken = new Set([...pages.map((p) => p.path), "/admin", "/api", "/assets", "/index"]);
+  for (const cp of site.customPages ?? []) if (cp.published !== false) pages.push(customPage(site, cp, taken));
+  return pages;
 }

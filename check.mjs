@@ -11,7 +11,8 @@ if (!existsSync(DIST)) { console.error("Run `node build.mjs` first."); process.e
 
 const walk = (d) => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)]));
 const files = walk(DIST);
-const htmlFiles = files.filter((f) => f.endsWith(".html"));
+// The website editor (dist/admin) is an app, not a public page: it is only checked for dynamic code below.
+const htmlFiles = files.filter((f) => f.endsWith(".html") && !relative(DIST, f).startsWith("admin"));
 const urlFor = (f) => { const r = "/" + relative(DIST, f).replace(/\\/g, "/"); return r === "/index.html" ? "/" : r.replace(/\.html$/, ""); };
 const pages = new Map(htmlFiles.map((f) => [urlFor(f), readFileSync(f, "utf8")]));
 const problems = [];

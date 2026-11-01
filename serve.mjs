@@ -2,6 +2,8 @@
 // Local preview of dist/ that behaves like Vercel's cleanUrls: /software serves dist/software.html.
 //   node serve.mjs            → http://localhost:4321
 //   PORT=8080 node serve.mjs
+// The website editor's API (api/admin.js) also runs here, so /admin works locally when ADMIN_PASSWORD, GITHUB_TOKEN
+// and GITHUB_REPO are set in your shell (it edits the real GitHub repository, exactly like on Vercel).
 import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize } from "node:path";
@@ -17,7 +19,7 @@ const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=
 
 function resolve(urlPath) {
   const clean = normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[/\\])+/, "");
-  const candidates = clean === "/" ? ["index.html"] : [clean.slice(1), `${clean.slice(1)}.html`];
+  const candidates = clean === "/" ? ["index.html"] : [clean.slice(1), `${clean.slice(1)}.html`, `${clean.slice(1)}/index.html`];
   for (const c of candidates) {
     const f = join(DIST, c);
     if (f.startsWith(DIST) && existsSync(f) && statSync(f).isFile()) return f;
@@ -25,8 +27,12 @@ function resolve(urlPath) {
   return null;
 }
 
-createServer((req, res) => {
+createServer(async (req, res) => {
   const path = new URL(req.url, "http://x").pathname;
+  if (path === "/api/admin") {
+    const { default: admin } = await import("./api/admin.js");
+    return admin(req, res);
+  }
   if (path.endsWith(".html") && path !== "/404.html") {
     res.writeHead(308, { Location: path.replace(/(index)?\.html$/, "") || "/" });
     return res.end();

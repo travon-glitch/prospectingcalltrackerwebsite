@@ -1,0 +1,11 @@
+{
+  "name": "prospecting-call-tracker-website",
+  "private": true,
+  "type": "module",
+  "description": "Marketing website + website editor. No dependencies: node build.mjs builds dist/.",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs && node check.mjs",
+    "dev": "node build.mjs && node serve.mjs"
+  }
+}

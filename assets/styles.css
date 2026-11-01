@@ -471,7 +471,7 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 
 /* ------------------------------------------------------------------ footer */
 
-.site-footer { background: #081427; color: #a9b7cb; padding: 64px 0 30px; font-size: 0.95rem; }
+.site-footer { background: var(--footer, #081427); color: #a9b7cb; padding: 64px 0 30px; font-size: 0.95rem; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(4, minmax(0, 1fr)); gap: 32px; }
 .footer-brand p { margin-top: 16px; max-width: 360px; }
 .footer-h { color: var(--white); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
@@ -681,3 +681,8 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
   .plans > .plan:nth-child(4) { grid-column: 2 / span 2; }
 }
 .plan-price { font-size: 1.55rem; }
+
+/* extra pages added in the website editor */
+.cp-split { align-items: center; }
+.cp-image img { box-shadow: var(--shadow); }
+.prose .cta-row { margin-top: 22px; }
