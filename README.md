@@ -104,7 +104,7 @@ Tag Manager can use them.
 You only need [Node.js](https://nodejs.org) 20 or newer.
 
 ```bash
-cd website
+cd prospectingcalltrackerwebsite
 node build.mjs     # builds dist/
 node check.mjs     # checks links, headings, labels, images
 node serve.mjs     # preview at http://localhost:4321

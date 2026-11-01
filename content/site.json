@@ -1,5 +1,5 @@
 {
-  "_readme": "ALL website copy lives in this file. Edit the text between the quotes, save, then run `node build.mjs` (or push to GitHub and Vercel rebuilds). Anything in [square brackets] or marked placeholder is waiting for your real information. See website/README.md.",
+  "_readme": "ALL website copy lives in this file. Edit the text between the quotes, save, then run `node build.mjs` (or push to GitHub and Vercel rebuilds). Anything in [square brackets] or marked placeholder is waiting for your real information. See README.md.",
 
   "site": {
     "name": "Prospecting Call Tracker",
