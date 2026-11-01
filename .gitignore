@@ -2,3 +2,7 @@ dist/
 node_modules/
 .DS_Store
 .vercel
+
+# Directus server settings (contain passwords)
+cms/.env
+*.zip

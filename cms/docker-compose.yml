@@ -1,0 +1,54 @@
+# Directus (the content backend) + its Postgres database.
+# Runs anywhere Docker runs: a small VPS (DigitalOcean, Hetzner, Lightsail), Railway, Render, Coolify…
+# NOT on Vercel: Directus needs an always-on server and a database. Vercel only hosts the website itself.
+#
+#   cp cms/.env.example cms/.env      # then fill in the values
+#   docker compose -f cms/docker-compose.yml --env-file cms/.env up -d
+#
+# Directus then runs on port 8055. Put it behind HTTPS on a subdomain, e.g. https://cms.prospectingcalltracker.com
+
+services:
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: directus
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: directus
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "directus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  directus:
+    image: directus/directus:12.6.0
+    restart: unless-stopped
+    ports:
+      - "8055:8055"
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - uploads:/directus/uploads
+    environment:
+      SECRET: ${DIRECTUS_SECRET}
+      PUBLIC_URL: ${PUBLIC_URL}
+      DB_CLIENT: pg
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_DATABASE: directus
+      DB_USER: directus
+      DB_PASSWORD: ${DB_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      TELEMETRY: "false"
+      # Lets the website (and only the website) show Directus images directly if ever needed.
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: ${WEBSITE_URL}
+
+volumes:
+  db_data:
+  uploads:

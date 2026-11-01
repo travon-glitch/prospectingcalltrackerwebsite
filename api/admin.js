@@ -29,6 +29,8 @@ const env = () => ({
   repo: process.env.GITHUB_REPO || (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}` : ""),
   branch: process.env.GITHUB_BRANCH || "main",
   api: (process.env.GITHUB_API || "https://api.github.com").replace(/\/$/, ""),
+  // When the site reads its content from Directus, Directus is the editor and this one steps aside.
+  directus: process.env.DIRECTUS_URL && process.env.DIRECTUS_TOKEN ? process.env.DIRECTUS_URL.replace(/\/$/, "") : "",
 });
 
 class HttpError extends Error {
@@ -158,6 +160,7 @@ function safeFileName(name) {
 
 const actions = {
   async session(req, e) {
+    if (e.directus) return { loggedIn: false, directus: e.directus };
     return { loggedIn: loggedIn(req, e), configured: { password: !!e.password, token: !!e.token, repo: !!e.repo }, repo: e.repo, branch: e.branch };
   },
 
@@ -293,6 +296,7 @@ export default async function handler(req, res) {
     if (isWrite) {
       if (req.headers["x-pct-admin"] !== "1" || !/^application\/json/i.test(req.headers["content-type"] || "")) throw new HttpError(403, "Request blocked.");
     }
+    if (e.directus && name !== "session") throw new HttpError(409, `This website is edited in Directus now: ${e.directus}/admin`);
     if (!PUBLIC.has(name) && !loggedIn(req, e)) throw new HttpError(401, "Your session has ended. Please log in again.");
     const body = isWrite ? await readBody(req) : {};
     const data = await action(req, e, body, res, url);

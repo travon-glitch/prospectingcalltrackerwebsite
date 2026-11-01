@@ -1,16 +1,25 @@
 # Prospecting Call Tracker — marketing website
 
-This folder is the public website (home, software, consulting, how it works, about the founder, resources, pricing,
-book a demo, contact, privacy, terms, thank-you and 404 pages). It is a plain, fast static site: **no npm packages, no
-framework, nothing to install**. A small script turns one text file into the finished pages.
+Everything for the website is in this one folder: the pages, all the words and prices (`content/site.json`), images,
+the built-in editor (`/admin`) and the optional Directus back office (`cms/`). It is a plain, fast static site:
+**no npm packages, no framework, nothing to install**.
 
-It is deployed as its **own Vercel project**, separate from the CRM app, and does not change how the CRM is built.
+## Deploy to Vercel (once, about 5 minutes)
+
+1. Vercel → **Add New… → Project** → import this GitHub repository (`prospectingcalltrackerwebsite`).
+2. **Framework Preset: Other.** Leave everything else as it is — the build settings are in `vercel.json`
+   (build command `node build.mjs`, output folder `dist`). Click **Deploy**.
+3. **Settings → Domains** → add `prospectingcalltracker.com` and `www.prospectingcalltracker.com`, then follow Vercel's DNS
+   steps at your domain registrar.
+4. To turn on the editor at `/admin`, add `ADMIN_PASSWORD` and `GITHUB_TOKEN` (section 0 below) and redeploy.
+5. Optional, later: connect Directus for team logins and a full back office — see `cms/README.md`.
 
 ```
 (repository root)
   content/site.json     ← ALL the words, prices, links, contact details and settings (edited by /admin).
   admin/                ← the website editor (opens at /admin)
   api/admin.js          ← the editor's server part (login, publish, uploads) — runs on Vercel
+  cms/                  ← optional Directus back office: setup script, server files, instructions (cms/README.md)
   assets/uploads/       ← photos uploaded in the editor
   assets/               ← styles.css, site.js (menu, forms, analytics), images, placeholders
   templates/            ← how the pages are laid out (only for design changes); validate.mjs checks content before publishing

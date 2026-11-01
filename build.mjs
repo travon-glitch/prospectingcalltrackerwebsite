@@ -13,6 +13,7 @@ import { page, themeCss } from "./templates/layout.mjs";
 import { setMockupNote } from "./templates/mockups.mjs";
 import { allPages } from "./templates/pages.mjs";
 import { parseContent, validateSite } from "./templates/validate.mjs";
+import { pullSite } from "./cms/directus.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const DIST = join(ROOT, "dist");
@@ -26,7 +27,20 @@ function loadContent() {
   return site;
 }
 
-const site = loadContent();
+// Content source: Directus when DIRECTUS_URL + DIRECTUS_TOKEN are set (see cms/README.md), otherwise content/site.json.
+let site = loadContent();
+let cmsFiles = null;
+if (process.env.DIRECTUS_URL && process.env.DIRECTUS_TOKEN) {
+  try {
+    const pulled = await pullSite({ url: process.env.DIRECTUS_URL, token: process.env.DIRECTUS_TOKEN, fallback: site });
+    site = pulled.site;
+    cmsFiles = pulled;
+    console.log(`Content loaded from Directus (${process.env.DIRECTUS_URL}).`);
+  } catch (err) {
+    console.error(`\nCould not load the content from Directus: ${err.message}\nThe live website stays as it is until this is fixed.\n`);
+    process.exit(1);
+  }
+}
 const problems = validateSite(site);
 if (problems.length) {
   console.error(`\ncontent/site.json can't be built yet:\n  - ${problems.join("\n  - ")}\n`);
@@ -45,6 +59,13 @@ const version = createHash("sha256")
 if (existsSync(DIST)) rmSync(DIST, { recursive: true, force: true });
 mkdirSync(DIST, { recursive: true });
 cpSync(join(ROOT, "assets"), join(DIST, "assets"), { recursive: true });
+if (cmsFiles) {
+  mkdirSync(join(DIST, "assets", "cms"), { recursive: true });
+  for (const [id, f] of cmsFiles.files) {
+    const res = await cmsFiles.download(id);
+    writeFileSync(join(DIST, f.path), Buffer.from(await res.arrayBuffer()));
+  }
+}
 if (themeCss(site)) writeFileSync(join(DIST, "assets", "theme.css"), themeCss(site));
 // The website editor (password protected; its API lives in api/admin.js).
 cpSync(join(ROOT, "admin"), join(DIST, "admin"), { recursive: true });

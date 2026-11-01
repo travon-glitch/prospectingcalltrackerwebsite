@@ -251,11 +251,21 @@
     pw.focus();
   }
 
+  function showDirectus(url) {
+    app.className = "login";
+    app.replaceChildren(h("div", { class: "login-card" },
+      h("div", { class: "login-brand" }, h("img", { src: "/assets/img/favicon.svg", alt: "" }), "Prospecting Call Tracker"),
+      h("h1", { text: "This website is edited in Directus" }),
+      h("p", { text: "Your content now lives in Directus. Make your changes there; the website rebuilds automatically about a minute after you save." }),
+      h("a", { class: "b b-primary", href: url + "/admin", text: "Open Directus →" })));
+  }
+
   /* ================================================================ boot */
 
   function boot() {
     api("session").then(function (s) {
       S.repo = s.repo; S.branch = s.branch;
+      if (s.directus) return showDirectus(s.directus);
       if (s.loggedIn) start();
       else showLogin("", s.configured);
     }).catch(function (e) {
