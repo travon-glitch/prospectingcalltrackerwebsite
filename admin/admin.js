@@ -230,8 +230,12 @@
     var err = h("p", { class: "banner banner-error", role: "alert", hidden: !message, text: message || "" });
     var pw = h("input", { type: "password", id: "pw", autocomplete: "current-password", required: true });
     var btn = h("button", { class: "b b-primary", type: "submit", text: "Log in" });
-    var setup = configured && (!configured.password || !configured.token || !configured.repo)
-      ? h("div", { class: "banner banner-warn" }, h("p", null, "The editor isn't set up yet. In Vercel → your project → Settings → Environment Variables, add ", h("b", { text: "ADMIN_PASSWORD" }), " and ", h("b", { text: "GITHUB_TOKEN" }), ", then redeploy. The README explains each step."))
+    var missing = configured ? [["password", "ADMIN_PASSWORD"], ["token", "GITHUB_TOKEN"], ["repo", "GITHUB_REPO"]].filter(function (x) { return !configured[x[0]]; }).map(function (x) { return x[1]; }) : [];
+    var setup = missing.length
+      ? h("div", { class: "banner banner-warn" },
+          h("p", null, "The editor isn't set up yet. This " + (S.deployment ? S.deployment + " " : "") + "deployment can't see " + (missing.length > 1 ? "these settings:" : "this setting:")),
+          h("ul", null, missing.map(function (m) { return h("li", null, h("b", { text: m })); })),
+          h("p", null, "In Vercel → your project → Settings → Environment Variables, add " + (missing.length > 1 ? "them" : "it") + " with ", h("b", { text: "Production" }), " ticked, then redeploy to Production. The README explains each step."))
       : null;
     var form = h("form", {
       onsubmit: function (e) {
@@ -264,7 +268,7 @@
 
   function boot() {
     api("session").then(function (s) {
-      S.repo = s.repo; S.branch = s.branch;
+      S.repo = s.repo; S.branch = s.branch; S.deployment = s.deployment || "";
       if (s.directus) return showDirectus(s.directus);
       if (s.loggedIn) start();
       else showLogin("", s.configured);

@@ -23,10 +23,21 @@ const MAX_UPLOAD_BYTES = 3 * 1024 * 1024; // Vercel accepts request bodies up to
 const UPLOAD_TYPES = { jpg: "image", jpeg: "image", png: "image", webp: "image", gif: "image", pdf: "file", xlsx: "file", xls: "file", csv: "file", docx: "file", mp4: "file" };
 const MEDIA_FOLDERS = ["assets/uploads", "assets/img", "assets/downloads", "assets/placeholders"];
 
+/** Accepts "owner/name" and also a pasted GitHub link such as https://github.com/owner/name(.git). */
+function repoName(v) {
+  const m = /^(?:https?:\/\/github\.com\/)?([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/i.exec(String(v || "").trim());
+  return m ? `${m[1]}/${m[2]}` : "";
+}
+
+/** Names of the Vercel settings that are still missing (names only, never values). */
+const missingSettings = (e) => [!e.password && "ADMIN_PASSWORD", !e.token && "GITHUB_TOKEN", !e.repo && "GITHUB_REPO"].filter(Boolean);
+
 const env = () => ({
-  password: process.env.ADMIN_PASSWORD || "",
-  token: process.env.GITHUB_TOKEN || "",
-  repo: process.env.GITHUB_REPO || (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}` : ""),
+  // .trim(): stray spaces or line breaks from copy/paste must not break the login.
+  password: (process.env.ADMIN_PASSWORD || "").trim(),
+  token: (process.env.GITHUB_TOKEN || "").trim(),
+  repo: repoName(process.env.GITHUB_REPO) || (process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}` : ""),
+  deployment: process.env.VERCEL_ENV || "", // "production", "preview" or "development" on Vercel
   branch: process.env.GITHUB_BRANCH || "main",
   api: (process.env.GITHUB_API || "https://api.github.com").replace(/\/$/, ""),
   // When the site reads its content from Directus, Directus is the editor and this one steps aside.
@@ -161,12 +172,15 @@ function safeFileName(name) {
 const actions = {
   async session(req, e) {
     if (e.directus) return { loggedIn: false, directus: e.directus };
-    return { loggedIn: loggedIn(req, e), configured: { password: !!e.password, token: !!e.token, repo: !!e.repo }, repo: e.repo, branch: e.branch };
+    return { loggedIn: loggedIn(req, e), configured: { password: !!e.password, token: !!e.token, repo: !!e.repo }, repo: e.repo, branch: e.branch, deployment: e.deployment };
   },
 
   async login(req, e, body, res) {
-    if (!e.password || !e.token || !e.repo) throw new HttpError(503, "The editor isn't set up yet: add ADMIN_PASSWORD and GITHUB_TOKEN in Vercel → Settings → Environment Variables, then redeploy.");
-    const ok = timingSafeEqual(sha(body.password ?? ""), sha(e.password));
+    const missing = missingSettings(e);
+    if (missing.length) {
+      throw new HttpError(503, `The editor isn't set up yet. This deployment${e.deployment ? ` (${e.deployment})` : ""} can't see: ${missing.join(", ")}. Add ${missing.length > 1 ? "them" : "it"} in Vercel → Settings → Environment Variables with “Production” ticked, then redeploy to Production.`);
+    }
+    const ok = timingSafeEqual(sha(String(body.password ?? "").trim()), sha(e.password));
     if (!ok) {
       await sleep(900); // slows down password guessing
       throw new HttpError(401, "That password isn't right.");
