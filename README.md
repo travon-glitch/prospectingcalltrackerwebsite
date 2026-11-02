@@ -45,7 +45,12 @@ What you can do there:
   screenshots, social-share image or any page. The **Media library** lists everything uploaded.
 - **Extra pages**: add new pages (guides, landing pages, service pages) with their own web address. Add them to the top menu
   under **Menu & buttons**.
-- **Menu, buttons, footer, contact details, social links, forms, analytics and brand colors.**
+- **Menu, buttons, footer, contact details, social links, forms and brand colors.**
+- **Integrations**: switch on and connect outside services, each with step-by-step help in the editor:
+  Stripe card payments (a "Pay now" button on each pricing package, using Stripe Payment Links), live chat & AI chatbots
+  (Tawk.to, Crisp, Tidio, Intercom, HubSpot), Calendly booking on the Book a Demo page, Zapier / Make webhooks (every
+  form submission to Google Sheets, Mailchimp, Slack, a CRM…), Google Analytics, Plausible, Meta Pixel and Microsoft
+  Clarity. Nothing loads for services that are off, and the site's security policy only opens up for the ones that are on.
 - **History & undo**: every publish is saved. Load any older version and publish it to put it back.
 - Unpublished edits are kept on your computer as a draft, so closing the tab doesn't lose your work. Ctrl+S / ⌘S publishes.
 - A change that would break the site (for example a bad web address for a new page) is refused with a plain-English
@@ -188,10 +193,10 @@ node serve.mjs     # preview at http://localhost:4321
 
 - No inline scripts, no `onclick=` style attributes, no inline `style=` attributes: the Content-Security-Policy forbids them.
   `node check.mjs` fails if any appear.
-- Each page carries a Content-Security-Policy `<meta>` tag built from `site.json` (it allows exactly the CRM address, analytics
-  and video host you configured). `vercel.json` adds a second, fixed policy as a header (plus clickjacking and other protections).
-  Browsers enforce both, so a script must pass both. If you use an analytics or video host other than Google Analytics,
-  Plausible (`plausible.io`), YouTube or Vimeo, add it to the header in `vercel.json` too.
+- Each page carries a Content-Security-Policy `<meta>` tag built from `site.json`: it allows exactly the CRM address,
+  analytics, video host and the **integrations switched on** in the editor (see `templates/integrations.mjs`), and nothing
+  else. `vercel.json` adds the other protections as headers (clickjacking, HSTS, …) and a fixed strict policy for `/admin`.
+  `node check.mjs` fails if a page has no policy or the policy allows inline scripts.
 - Do not add third-party scripts or npm packages. The forms send data only to your own CRM.
 
 ## 8. Legal pages

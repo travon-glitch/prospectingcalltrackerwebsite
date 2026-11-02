@@ -3,6 +3,7 @@
 import { button, checklist, ctaRow, faq, faqJsonLd, featureRow, finalCta, leadForm, mediaImage, metrics, pageHero, sectionHead, testimonials, videoBlock } from "./components.mjs";
 import { esc, icon, isPlaceholder } from "./html.mjs";
 import { mockups } from "./mockups.mjs";
+import { integrationsOf } from "./integrations.mjs";
 
 const stepsList = (steps, { details = false } = {}) => `<ol class="steps">${steps
   .map(
@@ -298,6 +299,14 @@ ${finalCta(site, site.pages.home.finalCta)}`;
 
 /* ================================================================ Pricing */
 
+/** Stripe Payment Link button for a pricing plan (only when Stripe is switched on and the plan has a link). */
+function payButton(site, pl) {
+  const st = integrationsOf(site).stripe;
+  const link = String(pl.paymentLink ?? "").trim();
+  if (!st.enabled || !/^https:\/\//.test(link)) return "";
+  return `<a class="btn btn-primary btn-block pay-btn" href="${esc(link)}" rel="noopener" data-cta="${esc(`${st.buttonLabel} – ${pl.name}`)}">${icon("shield", "btn-ic")}${esc(st.buttonLabel || "Pay now")}</a>${st.note ? `<p class="pay-note">${esc(st.note)}</p>` : ""}`;
+}
+
 function pricing(site) {
   const p = site.pages.pricing;
   const body = `
@@ -314,7 +323,7 @@ ${pageHero(site, p.hero, { compact: true })}
   <p class="plan-price">${esc(pl.price)}</p>
   ${pl.priceNote ? `<p class="plan-note ph-inline">${esc(pl.priceNote)}</p>` : ""}
   ${checklist(pl.items, "compact")}
-  <div class="card-cta">${button(site, pl.cta, pl.featured ? "primary" : "secondary", "btn-block")}</div>
+  <div class="card-cta">${payButton(site, pl) ? `${payButton(site, pl)}${button(site, pl.cta, "secondary", "btn-block")}` : button(site, pl.cta, pl.featured ? "primary" : "secondary", "btn-block")}</div>
 </article>`,
       )
       .join("")}</div>
@@ -342,8 +351,23 @@ ${pageHero(site, p.hero, { compact: true })}
     </div>
     ${leadForm(site, { kind: "demo", id: "demo-form", title: p.formTitle, page: "/demo" })}
   </div>
-</section>`;
+</section>
+${calendlySection(site)}`;
   return { path: "/demo", file: "demo.html", seo: p.seo, body };
+}
+
+/** Calendly scheduler (only when switched on in Integrations). An iframe: no third-party script on the page. */
+function calendlySection(site) {
+  const c = integrationsOf(site).calendly;
+  if (!c.enabled || !/^https:\/\/calendly\.com\//.test(String(c.url).trim())) return "";
+  const host = (() => { try { return new URL(site.site.url).hostname; } catch { return ""; } })();
+  const src = `${String(c.url).trim()}?embed_type=Inline&hide_gdpr_banner=1${host ? `&embed_domain=${encodeURIComponent(host)}` : ""}`;
+  return `<section class="section bg-soft" id="book" aria-labelledby="book-title">
+  <div class="container narrow">
+    ${sectionHead({ title: c.title || "Pick a time", intro: c.text, id: "book-title", center: true })}
+    <div class="calendly-frame"><iframe src="${esc(src)}" title="Book a time on our calendar (Calendly)" loading="lazy"></iframe></div>
+  </div>
+</section>`;
 }
 
 /* ================================================================ Contact */

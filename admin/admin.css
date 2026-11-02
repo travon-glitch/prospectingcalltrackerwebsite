@@ -220,3 +220,12 @@ dialog::backdrop { background: rgba(11, 27, 51, 0.55); }
 .check-mark { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-weight: 800; color: #fff; background: var(--green); }
 .checks li.bad .check-mark { background: var(--red); }
 .version { margin: 16px 0 0; font-size: 0.75rem; color: var(--muted); text-align: center; }
+
+/* integrations */
+.int-card > summary { align-items: flex-start; }
+.int-title { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.int-desc { font-weight: 400; font-size: 0.88rem; color: var(--muted); }
+.int-state { flex: none; font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--soft); color: var(--muted); border: 1px solid var(--line); }
+.int-state.on { background: var(--green-soft); color: var(--green-dark); border-color: #bfe6cf; }
+.int-state.needs { background: var(--amber-soft); color: #7a5600; border-color: #f1d98a; }
+.panel-body.flush { padding: 0; }

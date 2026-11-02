@@ -2,6 +2,7 @@
 
 import { esc, icon, isPlaceholder, join, slug } from "./html.mjs";
 import { mockups } from "./mockups.mjs";
+import { integrationClientConfig } from "./integrations.mjs";
 
 /* ---------------------------------------------------------------- buttons and CTAs */
 
@@ -148,6 +149,8 @@ export function featureRow(site, f, i) {
 export function leadForm(site, { kind, id, title, page }) {
   const F = site.forms;
   const configured = !/YOUR-CRM-DOMAIN/i.test(F.endpoint) && /^https:\/\//.test(F.endpoint);
+  // Zapier / Make webhooks (Integrations) can receive the form even when no CRM address is set.
+  const hooked = (integrationClientConfig(site).webhooks ?? []).length > 0;
   const fixedType = kind === "kpi" ? "kpi_download" : kind === "contact" ? "contact" : null;
   const types = Object.entries(F.requestTypes).filter(([k]) => k !== "kpi_download" && k !== "contact");
   const f = (name) => `${id}-${name}`;
@@ -160,7 +163,7 @@ export function leadForm(site, { kind, id, title, page }) {
   </div>`;
   return `<div class="form-card" id="${id}-wrap">
   ${title ? `<h2 class="form-title" id="${id}-title">${esc(title)}</h2>` : ""}
-  <form class="lead-form" id="${id}" ${configured ? `action="${esc(F.endpoint)}" ` : ""}method="post" novalidate data-endpoint="${configured ? esc(F.endpoint) : ""}" data-fixed-type="${fixedType ?? ""}"${title ? ` aria-labelledby="${id}-title"` : ""}>
+  <form class="lead-form" id="${id}" ${configured ? `action="${esc(F.endpoint)}" ` : ""}method="post" novalidate data-endpoint="${configured ? esc(F.endpoint) : ""}"${hooked ? ' data-webhooks="1"' : ""} data-fixed-type="${fixedType ?? ""}"${title ? ` aria-labelledby="${id}-title"` : ""}>
     <div class="form-alert" id="${f("alert")}" role="alert" hidden></div>
     ${
       fixedType

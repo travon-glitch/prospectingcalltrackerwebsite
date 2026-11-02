@@ -43,6 +43,42 @@
     "plausibleDomain": "",
     "plausibleScript": "https://plausible.io/js/script.js"
   },
+  "integrations": {
+    "_help": "Connect outside services. Switch one on, fill in its details, then publish. Nothing loads on the website for services that are switched off.",
+    "stripe": {
+      "enabled": false,
+      "buttonLabel": "Pay now",
+      "note": "Secure checkout by Stripe"
+    },
+    "chat": {
+      "enabled": false,
+      "provider": "tawk",
+      "tawkPropertyId": "",
+      "tawkWidgetId": "default",
+      "crispWebsiteId": "",
+      "tidioPublicKey": "",
+      "intercomAppId": "",
+      "hubspotPortalId": ""
+    },
+    "calendly": {
+      "enabled": false,
+      "url": "",
+      "title": "Prefer to pick a time yourself?",
+      "text": "Choose a time below — it's added to our calendar instantly."
+    },
+    "metaPixel": {
+      "enabled": false,
+      "pixelId": ""
+    },
+    "clarity": {
+      "enabled": false,
+      "projectId": ""
+    },
+    "webhooks": {
+      "enabled": false,
+      "urls": []
+    }
+  },
   "theme": {
     "_help": "Brand colors used across the website. Use the color pickers in the website editor, or a hex code like #12A150.",
     "accentColor": "#12A150",
@@ -1021,7 +1057,8 @@
             "Personal KPI dashboard",
             "Onboarding session"
           ],
-          "cta": "demo"
+          "cta": "demo",
+          "paymentLink": ""
         },
         {
           "name": "Team CRM Package",
@@ -1037,6 +1074,7 @@
             "Team onboarding"
           ],
           "cta": "demo",
+          "paymentLink": "",
           "featured": true,
           "badge": "Most popular for teams"
         },
@@ -1053,7 +1091,8 @@
             "KPI scorecards",
             "Coaching sessions [number to be confirmed]"
           ],
-          "cta": "strategyCall"
+          "cta": "strategyCall",
+          "paymentLink": ""
         },
         {
           "name": "Custom Team Buildout",
@@ -1067,7 +1106,8 @@
             "Agreed configuration and reporting work",
             "Defined scope — no unlimited custom programming"
           ],
-          "cta": "strategyCall"
+          "cta": "strategyCall",
+          "paymentLink": ""
         },
         {
           "name": "Founding Team Offer",
@@ -1081,6 +1121,7 @@
             "Priority onboarding"
           ],
           "cta": "foundingTeam",
+          "paymentLink": "",
           "id": "founding-team"
         }
       ],

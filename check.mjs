@@ -33,6 +33,10 @@ for (const [url, raw] of pages) {
   if (!/<meta name="description" content="[^"]{50,}"/.test(raw)) bad(url, "missing/short meta description");
   if (!/<link rel="canonical" href="https:\/\//.test(raw)) bad(url, "missing canonical");
   if (!/<html lang="/.test(raw)) bad(url, "missing <html lang>");
+  // Each page carries its own Content-Security-Policy (built from site.json, incl. switched-on integrations).
+  const csp = /<meta http-equiv="Content-Security-Policy" content="([^"]+)"/.exec(raw)?.[1]?.replace(/&#39;/g, "'") ?? "";
+  if (!/default-src 'self'/.test(csp) || !/object-src 'none'/.test(csp) || !/script-src 'self'/.test(csp)) bad(url, "missing or weak Content-Security-Policy");
+  if (/script-src[^;]*'unsafe-(inline|eval)'/.test(csp)) bad(url, "Content-Security-Policy allows inline scripts");
   // Heading levels must not skip (h2 -> h4).
   let prev = 0;
   for (const m of html.matchAll(/<h([1-6])[\s>]/g)) { const l = Number(m[1]); if (prev && l > prev + 1) bad(url, `heading jumps from h${prev} to h${l}`); prev = l; }

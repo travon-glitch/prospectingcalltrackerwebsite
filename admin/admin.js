@@ -31,9 +31,9 @@
     { id: "media", label: "Photos & video", keys: ["media"], intro: "Founder photo, CRM screenshots, demo video and the KPI Tracker download." },
     { id: "theme", label: "Brand colors", keys: ["theme"], intro: "Colors used across the whole website. Changes show after you publish." },
     { id: "forms", label: "Forms", keys: ["forms"], intro: "Where form submissions are sent and the questions on the forms." },
-    { id: "analytics", label: "Analytics", keys: ["analytics"], intro: "Optional visitor statistics. Nothing loads unless you fill one in." },
+    { id: "integrations", label: "Integrations (payments, chat…)", keys: ["integrations", "analytics"] },
   ];
-  var HIDDEN_TOP = { _readme: 1, pages: 1, customPages: 1 };
+  var HIDDEN_TOP = { _readme: 1, pages: 1, customPages: 1, integrations: 1, analytics: 1 };
 
   var MOCKUPS = ["hero", "leadList", "leadCard", "followups", "pipeline", "scoreboard", "aiDraft", "listImport", "assignment", "dialer", "texting", "emailCenter", "smartPlan", "kpis", "roi", "permissions", "coaching"];
 
@@ -53,6 +53,9 @@
     heading: "Heading", text: "Text", image: "Image", button: "Button", sections: "Sections", label: "Text", title: "Title",
     name: "Name", value: "Value", note: "Note", endpoint: "Form destination (your CRM address)",
     googleAnalyticsId: "Google Analytics ID", plausibleDomain: "Plausible domain", plausibleScript: "Plausible script link",
+    enabled: "Switched on", buttonLabel: "Button text", paymentLink: "Stripe payment link", tawkPropertyId: "Property ID", tawkWidgetId: "Widget ID",
+    crispWebsiteId: "Website ID", tidioPublicKey: "Public key", intercomAppId: "App ID", hubspotPortalId: "Hub ID", pixelId: "Pixel ID",
+    projectId: "Project ID", urls: "Webhook addresses",
     founderName: "Founder name", founderTitle: "Founder title", kpiTrackerDownloadUrl: "KPI Tracker download file",
     mockupNote: "Caption under the dashboard illustrations", nav: "Top menu", headerCta: "Button in the top corner",
     benefit: "Headline", id: "Link name (for #links)", consentText: "Consent checkbox text", thankYouPath: "Page shown after sending a form",
@@ -155,7 +158,7 @@
     return "Item " + (i + 1);
   }
   function singular(key) {
-    var map = { items: "item", features: "feature", services: "service", sections: "section", plans: "plan", steps: "step", stats: "number", values: "value", testimonials: "testimonial", metrics: "number", nav: "menu link", links: "link", columns: "column", legal: "link", social: "link", screenshots: "screenshot", footnotes: "footnote", customPages: "page", story: "paragraph", p: "paragraph", points: "point", who: "line", expect: "line", details: "detail", heroButtons: "button", ctas: "button" };
+    var map = { items: "item", features: "feature", services: "service", sections: "section", plans: "plan", steps: "step", stats: "number", values: "value", testimonials: "testimonial", metrics: "number", nav: "menu link", links: "link", columns: "column", legal: "link", social: "link", screenshots: "screenshot", footnotes: "footnote", customPages: "page", story: "paragraph", p: "paragraph", points: "point", who: "line", expect: "line", details: "detail", heroButtons: "button", ctas: "button", urls: "webhook address" };
     return map[key] || "item";
   }
   function toast(msg, kind, ms) {
@@ -464,6 +467,7 @@
         showProblem("Your website content file has a formatting mistake, so the editor can't open it.", d.error || "");
         return;
       }
+      ensureIntegrations(d.content);
       S.site = d.content; S.sha = d.sha; S.saved = JSON.stringify(d.content);
       shell();
       var draft = null;
@@ -626,6 +630,7 @@
     else if (id === "library") out = libraryView();
     else if (id === "history") out = historyView();
     else if (id === "custom") out = customView();
+    else if (id === "integrations") out = integrationsView();
     else if (id === "other") out = keysView("Other settings", "Small settings that don't belong anywhere else.", otherKeys());
     else if (id.indexOf("page:") === 0) out = pageView(id.slice(5));
     else {
@@ -634,6 +639,167 @@
     }
     view.replaceChildren(out);
     updateStatus();
+  }
+
+  /* ================================================================ integrations */
+
+  // Same shape as templates/integrations.mjs → INTEGRATION_DEFAULTS.
+  var INTEGRATION_DEFAULTS = {
+    _help: "Connect outside services. Switch one on, fill in its details, then publish. Nothing loads on the website for services that are switched off.",
+    stripe: { enabled: false, buttonLabel: "Pay now", note: "Secure checkout by Stripe" },
+    chat: { enabled: false, provider: "tawk", tawkPropertyId: "", tawkWidgetId: "default", crispWebsiteId: "", tidioPublicKey: "", intercomAppId: "", hubspotPortalId: "" },
+    calendly: { enabled: false, url: "", title: "Prefer to pick a time yourself?", text: "Choose a time below — it's added to our calendar instantly." },
+    metaPixel: { enabled: false, pixelId: "" },
+    clarity: { enabled: false, projectId: "" },
+    webhooks: { enabled: false, urls: [] },
+  };
+  function ensureIntegrations(site) {
+    site.integrations = site.integrations || {};
+    Object.keys(INTEGRATION_DEFAULTS).forEach(function (k) {
+      var d = INTEGRATION_DEFAULTS[k];
+      if (typeof d !== "object") { if (site.integrations[k] === undefined) site.integrations[k] = d; return; }
+      site.integrations[k] = Object.assign(clone(d), site.integrations[k] || {});
+    });
+    site.analytics = site.analytics || { googleAnalyticsId: "", plausibleDomain: "", plausibleScript: "https://plausible.io/js/script.js" };
+  }
+
+  var CHAT = {
+    tawk: { label: "Tawk.to", note: "Free live chat, with an optional AI assistant.", fields: { tawkPropertyId: /^[a-f0-9]{16,32}$/i, tawkWidgetId: /^[a-z0-9]{1,32}$/i },
+      help: "In tawk.to: Administration (gear icon) → Channels → Chat Widget. The widget code contains https://embed.tawk.to/PROPERTY_ID/WIDGET_ID — copy the two parts into the boxes above.", link: "https://www.tawk.to" },
+    crisp: { label: "Crisp", note: "Live chat with a chatbot and shared inbox.", fields: { crispWebsiteId: /^[a-f0-9-]{36}$/i },
+      help: "In Crisp: Settings → Workspace settings → Setup & integrations → copy the Website ID (looks like 1a2b3c4d-…).", link: "https://crisp.chat" },
+    tidio: { label: "Tidio", note: "Live chat with the Lyro AI chatbot.", fields: { tidioPublicKey: /^[a-z0-9]{20,40}$/i },
+      help: "In Tidio: Settings → Developer → copy the Public key.", link: "https://www.tidio.com" },
+    intercom: { label: "Intercom", note: "Messenger with the Fin AI agent.", fields: { intercomAppId: /^[a-z0-9]{6,12}$/i },
+      help: "In Intercom: Settings → Installation → Web → your App ID (shown as app_id in the code, e.g. abc12345).", link: "https://www.intercom.com" },
+    hubspot: { label: "HubSpot", note: "HubSpot chat, plus visitor tracking for your HubSpot CRM.", fields: { hubspotPortalId: /^\d{4,12}$/ },
+      help: "In HubSpot: Settings → Tracking & Analytics → Tracking code. Copy the number in js.hs-scripts.com/NUMBER.js (your Hub ID).", link: "https://www.hubspot.com" },
+  };
+  var RE = { metaPixel: /^\d{10,20}$/, clarity: /^[a-z0-9]{6,20}$/i, calendly: /^https:\/\/calendly\.com\/[A-Za-z0-9_\-/]+$/, https: /^https:\/\/\S+$/, ga: /^G-[A-Z0-9]+$/i };
+
+  /** "on" (switched on and filled in), "needs" (switched on, details missing or wrong) or "off". */
+  function integrationState(key) {
+    var i = S.site.integrations, a = S.site.analytics || {};
+    var v = function (x) { return String(x || "").trim(); };
+    switch (key) {
+      case "stripe": return !i.stripe.enabled ? "off" : (S.site.pages.pricing.plans || []).some(function (p) { return RE.https.test(v(p.paymentLink)); }) ? "on" : "needs";
+      case "chat": {
+        if (!i.chat.enabled) return "off";
+        var p = CHAT[i.chat.provider];
+        return p && Object.keys(p.fields).every(function (f) { return p.fields[f].test(v(i.chat[f])); }) ? "on" : "needs";
+      }
+      case "calendly": return !i.calendly.enabled ? "off" : RE.calendly.test(v(i.calendly.url)) ? "on" : "needs";
+      case "metaPixel": return !i.metaPixel.enabled ? "off" : RE.metaPixel.test(v(i.metaPixel.pixelId)) ? "on" : "needs";
+      case "clarity": return !i.clarity.enabled ? "off" : RE.clarity.test(v(i.clarity.projectId)) ? "on" : "needs";
+      case "webhooks": {
+        if (!i.webhooks.enabled) return "off";
+        var urls = (i.webhooks.urls || []).map(v).filter(Boolean);
+        return urls.length && urls.every(function (u) { return RE.https.test(u); }) ? "on" : "needs";
+      }
+      case "ga": return v(a.googleAnalyticsId) ? (RE.ga.test(v(a.googleAnalyticsId)) ? "on" : "needs") : "off";
+      case "plausible": return v(a.plausibleDomain) ? "on" : "off";
+    }
+    return "off";
+  }
+  var STATE_TEXT = { on: "Connected", needs: "Needs details", off: "Off" };
+
+  function integrationsView() {
+    ensureIntegrations(S.site);
+    var i = S.site.integrations;
+    var wrap = h("div", { class: "integrations" }, head("Integrations", "Connect payments, live chat, booking, tracking and other apps. Switch one on, fill in its details, then click Publish — it's on your website about a minute later."));
+    wrap.appendChild(h("p", { class: "help", text: "Good to know: chat and tracking tools (Meta Pixel, Clarity, Google Analytics, HubSpot) collect visitor information. Mention the ones you use in your Privacy Policy (Pages → Privacy Policy)." }));
+
+    function cardFor(key, title, desc, buildBody, link) {
+      var pill = h("span", { class: "int-state", "data-int": key });
+      var body = h("div", { class: "panel-body" });
+      var ps = "int:" + key;
+      var d = h("details", { class: "panel int-card", open: S.open[ps] !== undefined ? S.open[ps] : integrationState(key) !== "off" },
+        h("summary", null, h("span", { class: "int-title" }, h("b", { text: title }), h("span", { class: "int-desc", text: desc })), pill), body);
+      d.addEventListener("toggle", function () { S.open[ps] = d.open; });
+      buildBody(body);
+      if (link) body.appendChild(h("p", { class: "hint" }, "Don't have an account? ", h("a", { href: link, target: "_blank", rel: "noopener", text: "Sign up here ↗" })));
+      return d;
+    }
+    var path = function () { return Array.prototype.slice.call(arguments); };
+
+    wrap.appendChild(cardFor("stripe", "Stripe — card payments", "Let visitors pay by card from your pricing page.", function (b) {
+      b.appendChild(field(path("integrations", "stripe", "enabled"), i.stripe.enabled, "enabled", i.stripe));
+      b.appendChild(h("p", { class: "help", text: "How it works: in Stripe, create a Payment Link for each package (Stripe → Payment Links → New → choose the product and price → Create link) and paste it below. Visitors click “" + (i.stripe.buttonLabel || "Pay now") + "” on that pricing card and pay on Stripe's secure page — no card details ever touch your website. In the payment link's settings, under “After payment”, you can send people to your /thank-you page." }));
+      var plans = S.site.pages.pricing.plans || [];
+      var fs = h("fieldset", { class: "group" }, h("legend", { text: "Payment link for each pricing package (leave empty for no Pay button)" }));
+      plans.forEach(function (pl, n) { fs.appendChild(field(path("pages", "pricing", "plans", n, "paymentLink"), pl.paymentLink || "", "paymentLink", pl)); fs.lastChild.querySelector("label").textContent = pl.name; });
+      b.appendChild(fs);
+      b.appendChild(field(path("integrations", "stripe", "buttonLabel"), i.stripe.buttonLabel, "buttonLabel", i.stripe));
+      b.appendChild(field(path("integrations", "stripe", "note"), i.stripe.note, "note", i.stripe));
+      b.appendChild(h("p", { class: "hint", text: "Need a pay button somewhere else? Go to Menu & buttons → Buttons, add a button and use the Stripe payment link as its Link." }));
+    }, "https://dashboard.stripe.com/register"));
+
+    wrap.appendChild(cardFor("chat", "Live chat & AI chatbot", "A chat bubble on every page so visitors can message you (or your chatbot).", function (b) {
+      b.appendChild(field(path("integrations", "chat", "enabled"), i.chat.enabled, "enabled", i.chat));
+      var pid = uid();
+      var sel = h("select", { id: pid }, Object.keys(CHAT).map(function (k) { return h("option", { value: k, text: CHAT[k].label + " — " + CHAT[k].note, selected: k === i.chat.provider }); }));
+      var holder = h("div", { class: "panel-body flush" });
+      function drawProvider() {
+        var p = CHAT[i.chat.provider] || CHAT.tawk;
+        holder.replaceChildren();
+        Object.keys(p.fields).forEach(function (f) { holder.appendChild(field(path("integrations", "chat", f), i.chat[f] || "", f, i.chat)); });
+        holder.appendChild(h("p", { class: "help" }, p.help + " ", h("a", { href: p.link, target: "_blank", rel: "noopener", text: p.label + " ↗" })));
+      }
+      sel.addEventListener("change", function () { setAt(path("integrations", "chat", "provider"), sel.value); drawProvider(); refreshStates(); });
+      b.appendChild(h("div", { class: "field" }, h("label", { for: pid, text: "Chat service" }), sel));
+      b.appendChild(holder);
+      drawProvider();
+      b.appendChild(h("p", { class: "hint", text: "Most of these services include an AI chatbot you set up in their own dashboard (e.g. Tidio Lyro, Intercom Fin, Tawk.to AI Assist). Answer chats from their phone app." }));
+    }));
+
+    wrap.appendChild(cardFor("calendly", "Calendly — online booking", "Visitors pick a meeting time on your Book a Demo page.", function (b) {
+      b.appendChild(field(path("integrations", "calendly", "enabled"), i.calendly.enabled, "enabled", i.calendly));
+      b.appendChild(field(path("integrations", "calendly", "url"), i.calendly.url, "url", i.calendly));
+      b.lastChild.querySelector(".hint") && (b.lastChild.querySelector(".hint").textContent = "In Calendly: open your event type → Share → copy the link, e.g. https://calendly.com/your-name/30min");
+      b.appendChild(field(path("integrations", "calendly", "title"), i.calendly.title, "title", i.calendly));
+      b.appendChild(field(path("integrations", "calendly", "text"), i.calendly.text, "text", i.calendly));
+    }, "https://calendly.com/signup"));
+
+    wrap.appendChild(cardFor("webhooks", "Zapier / Make — connect any app", "Send every form submission to Google Sheets, Mailchimp, Slack, a CRM and 6,000+ other apps.", function (b) {
+      b.appendChild(field(path("integrations", "webhooks", "enabled"), i.webhooks.enabled, "enabled", i.webhooks));
+      b.appendChild(h("p", { class: "help", text: "Zapier: create a Zap → trigger “Webhooks by Zapier” → “Catch Hook” → copy the webhook URL. Make: create a scenario → “Webhooks” → “Custom webhook” → copy the address. Paste it below. Each form submission is also sent there (name, email, phone, brokerage, message, which form, page, time). Works even before your CRM is connected." }));
+      b.appendChild(h("div", { class: "field" }, h("span", { class: "label", text: "Webhook addresses" }), listEditor(path("integrations", "webhooks", "urls"), "urls", i.webhooks.urls)));
+    }, "https://zapier.com/sign-up"));
+
+    wrap.appendChild(cardFor("ga", "Google Analytics", "Visitor statistics from Google (free).", function (b) {
+      b.appendChild(field(path("analytics", "googleAnalyticsId"), S.site.analytics.googleAnalyticsId || "", "googleAnalyticsId", S.site.analytics));
+      b.appendChild(h("p", { class: "help", text: "In Google Analytics: Admin → Data streams → your website → copy the Measurement ID (G-…). Leave empty to switch it off." }));
+    }, "https://analytics.google.com"));
+
+    wrap.appendChild(cardFor("plausible", "Plausible Analytics", "Simple, privacy-friendly visitor statistics (paid).", function (b) {
+      b.appendChild(field(path("analytics", "plausibleDomain"), S.site.analytics.plausibleDomain || "", "plausibleDomain", S.site.analytics));
+      b.appendChild(h("p", { class: "help", text: "Type your domain exactly as added in Plausible, e.g. prospectingcalltracker.com. Leave empty to switch it off." }));
+    }, "https://plausible.io/register"));
+
+    wrap.appendChild(cardFor("metaPixel", "Meta (Facebook) Pixel", "Measure and retarget your Facebook & Instagram ads. Form submissions count as Leads.", function (b) {
+      b.appendChild(field(path("integrations", "metaPixel", "enabled"), i.metaPixel.enabled, "enabled", i.metaPixel));
+      b.appendChild(field(path("integrations", "metaPixel", "pixelId"), i.metaPixel.pixelId, "pixelId", i.metaPixel));
+      b.appendChild(h("p", { class: "help", text: "In Meta Events Manager: Data sources → your Pixel → copy the long number under its name (the Pixel ID)." }));
+    }, "https://business.facebook.com/events_manager"));
+
+    wrap.appendChild(cardFor("clarity", "Microsoft Clarity", "Free heatmaps and session recordings to see how visitors use your site.", function (b) {
+      b.appendChild(field(path("integrations", "clarity", "enabled"), i.clarity.enabled, "enabled", i.clarity));
+      b.appendChild(field(path("integrations", "clarity", "projectId"), i.clarity.projectId, "projectId", i.clarity));
+      b.appendChild(h("p", { class: "help", text: "In Clarity: your project → Settings → Overview → copy the Project ID (letters and numbers, e.g. abcd1234ef)." }));
+    }, "https://clarity.microsoft.com"));
+
+    function refreshStates() {
+      wrap.querySelectorAll(".int-state").forEach(function (el) {
+        var st = integrationState(el.getAttribute("data-int"));
+        el.className = "int-state " + st;
+        el.textContent = STATE_TEXT[st];
+      });
+    }
+    wrap.addEventListener("input", refreshStates);
+    wrap.addEventListener("change", refreshStates);
+    wrap.addEventListener("click", function (e) { if (e.target.closest(".add-row, .str-tools")) setTimeout(refreshStates, 50); });
+    refreshStates();
+    return wrap;
   }
 
   function head(title, intro, extra) {

@@ -31,6 +31,62 @@
     loadScript(A.plausibleScript, { "data-domain": A.plausibleDomain });
   }
 
+  /* ------------------------------------------------------------ integrations (switched on in the website editor) */
+
+  var I = CFG.integrations || {};
+  var enc = encodeURIComponent;
+  if (I.metaPixel) {
+    var fbq = (window.fbq = function () { fbq.callMethod ? fbq.callMethod.apply(fbq, arguments) : fbq.queue.push(arguments); });
+    if (!window._fbq) window._fbq = fbq;
+    fbq.push = fbq; fbq.loaded = true; fbq.version = "2.0"; fbq.queue = [];
+    loadScript("https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", I.metaPixel);
+    fbq("track", "PageView");
+  }
+  if (I.clarity) {
+    window.clarity = window.clarity || function () { (window.clarity.q = window.clarity.q || []).push(arguments); };
+    loadScript("https://www.clarity.ms/tag/" + enc(I.clarity));
+  }
+  /** Live chat loads a moment after the page, so it never slows the page down. */
+  function loadChat(c) {
+    if (c.provider === "tawk" && c.tawkPropertyId) {
+      window.Tawk_API = window.Tawk_API || {};
+      window.Tawk_LoadStart = new Date();
+      loadScript("https://embed.tawk.to/" + enc(c.tawkPropertyId) + "/" + enc(c.tawkWidgetId || "default"), { charset: "UTF-8", crossorigin: "*" });
+    } else if (c.provider === "crisp" && c.crispWebsiteId) {
+      window.$crisp = [];
+      window.CRISP_WEBSITE_ID = c.crispWebsiteId;
+      loadScript("https://client.crisp.chat/l.js");
+    } else if (c.provider === "tidio" && c.tidioPublicKey) {
+      loadScript("https://code.tidio.co/" + enc(c.tidioPublicKey) + ".js");
+    } else if (c.provider === "intercom" && c.intercomAppId) {
+      window.intercomSettings = { api_base: "https://api-iam.intercom.io", app_id: c.intercomAppId };
+      var ic = function () { ic.c(arguments); };
+      ic.q = []; ic.c = function (a) { ic.q.push(a); };
+      window.Intercom = ic;
+      loadScript("https://widget.intercom.io/widget/" + enc(c.intercomAppId));
+    } else if (c.provider === "hubspot" && c.hubspotPortalId) {
+      loadScript("https://js.hs-scripts.com/" + enc(c.hubspotPortalId) + ".js", { id: "hs-script-loader" });
+    }
+  }
+  if (I.chat) {
+    var startChat = function () { setTimeout(function () { loadChat(I.chat); }, 1200); };
+    if (document.readyState === "complete") startChat(); else window.addEventListener("load", startChat);
+  }
+  var HOOKS = I.webhooks || [];
+  /** Sends a copy of a form submission to the Zapier / Make webhooks. Resolves to true if at least one was sent. */
+  function sendHooks(data) {
+    if (!HOOKS.length) return Promise.resolve(false);
+    var body = new URLSearchParams();
+    Object.keys(data).forEach(function (k) { if (k !== "hp_extra") body.append(k, String(data[k])); });
+    body.append("submitted_at", new Date().toISOString());
+    body.append("page_url", location.href);
+    return Promise.all(HOOKS.map(function (u) {
+      return fetch(u, { method: "POST", mode: "no-cors", credentials: "omit", keepalive: true, body: body.toString(), headers: { "Content-Type": "application/x-www-form-urlencoded" } })
+        .then(function () { return true; }, function () { return false; });
+    })).then(function (r) { return r.some(Boolean); });
+  }
+
   /** Records an event: always to window.dataLayer; to Google Analytics / Plausible only when they are configured. */
   function track(event, props) {
     props = props || {};
@@ -38,6 +94,8 @@
     window.dataLayer.push(Object.assign({ event: event }, props));
     if (typeof window.gtag === "function" && A.ga) window.gtag("event", event, props);
     if (typeof window.plausible === "function" && A.plausibleDomain) window.plausible(event, { props: props });
+    if (typeof window.fbq === "function" && I.metaPixel && /_submit$/.test(event)) window.fbq("track", "Lead", { content_name: event });
+    if (typeof window.clarity === "function" && I.clarity) window.clarity("event", event);
   }
   window.pctTrack = track;
 
@@ -152,7 +210,7 @@
         return;
       }
       var endpoint = form.getAttribute("data-endpoint");
-      if (!endpoint) {
+      if (!endpoint && !HOOKS.length) {
         showAlert("This form isn't connected yet." + (CFG.contactEmail ? " Please email us at " + CFG.contactEmail + "." : " Please try again soon."));
         track("form_error", { form: type, reason: "not_configured" });
         return;
@@ -171,15 +229,20 @@
       var label = btn.textContent;
       btn.textContent = "Sending…";
 
-      fetch(endpoint, { method: "POST", mode: "cors", credentials: "omit", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(data) })
-        .then(function (res) {
-          return res.json().catch(function () { return {}; }).then(function (body) { return { ok: res.ok, status: res.status, body: body }; });
-        })
+      // Spam bots fill the hidden field: pretend it worked, send nothing.
+      var deliver = data.hp_extra ? Promise.resolve({ ok: true, status: 200, body: {} }) : endpoint
+        ? fetch(endpoint, { method: "POST", mode: "cors", credentials: "omit", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(data) })
+            .then(function (res) {
+              return res.json().catch(function () { return {}; }).then(function (body) { return { ok: res.ok, status: res.status, body: body }; });
+            })
+        : sendHooks(data).then(function (sent) { return { ok: sent, status: sent ? 200 : 502, body: {} }; });
+      deliver
         .then(function (r) {
           if (!r.ok) {
             var msg = r.status === 429 ? "Too many requests from this connection. Please wait a few minutes and try again." : (r.body && typeof r.body.message === "string" && r.body.message.length < 300 ? r.body.message : "Something went wrong sending your request. Please try again.");
             throw { message: msg, status: r.status };
           }
+          if (endpoint && !data.hp_extra) sendHooks(data); // also copy it to Zapier / Make
           var t = types[type] || {};
           track(t.event || "form_submit", { form: type, cta: data.cta || "" });
           form.hidden = true;

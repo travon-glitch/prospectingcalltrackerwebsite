@@ -5,6 +5,7 @@
 import { page } from "./layout.mjs";
 import { setMockupNote } from "./mockups.mjs";
 import { allPages } from "./pages.mjs";
+import { integrationProblems } from "./integrations.mjs";
 
 const REQUIRED = ["site.name", "site.url", "forms.endpoint", "forms.requestTypes", "ctas", "nav", "footer.disclaimer", "pages.home", "pages.software", "pages.consulting", "pages.howItWorks", "pages.about", "pages.resources", "pages.pricing", "pages.demo", "pages.contact", "pages.privacy", "pages.terms", "pages.thankYou", "pages.notFound"];
 
@@ -34,6 +35,7 @@ export function validateSite(site) {
     if (k.startsWith("_")) continue;
     if (v && !HEX_COLOR.test(v)) problems.push(`Theme colors → ${k} must be a color like #12A150 (got “${v}”).`);
   }
+  problems.push(...integrationProblems(site));
   if (problems.length) return problems;
   try {
     setMockupNote(site.mockupNote);

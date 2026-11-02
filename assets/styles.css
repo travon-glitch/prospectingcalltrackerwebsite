@@ -686,3 +686,10 @@ fieldset.field { border: 0; padding: 0; margin: 0; }
 .cp-split { align-items: center; }
 .cp-image img { box-shadow: var(--shadow); }
 .prose .cta-row { margin-top: 22px; }
+
+/* integrations: Stripe pay buttons and the Calendly scheduler */
+.pay-btn + .btn { margin-top: 10px; }
+.pay-note { font-size: 0.8rem; color: var(--muted); text-align: center; margin: 6px 0 0; }
+.calendly-frame { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.calendly-frame iframe { display: block; width: 100%; height: 720px; border: 0; }
+@media (max-width: 640px) { .calendly-frame iframe { height: 900px; } }

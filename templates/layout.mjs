@@ -1,6 +1,7 @@
 // The page shell: <head> (SEO, social cards, structured data, CSP), header with mobile menu, footer.
 
 import { esc, icon, isPlaceholder } from "./html.mjs";
+import { integrationClientConfig, integrationCsp } from "./integrations.mjs";
 
 /** The logo mark: a call handset inside a rising bar chart. Decorative next to the visible wordmark text. */
 export const logoMark = (cls = "logo-mark") => `<svg class="${cls}" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true" focusable="false">
@@ -112,14 +113,21 @@ export function contentSecurityPolicy(site) {
   const video = origin(site.media.demoVideo.embedUrl);
   if (video) frame.push(video);
   const fonts = site.site.googleFontsCss ? origin(site.site.googleFontsCss) : "";
+  // Integrations switched on in the editor (chat, pixels, Calendly, webhooks) add exactly the addresses they need.
+  const extra = integrationCsp(site);
+  for (const u of integrationClientConfig(site).webhooks ?? []) if (origin(u)) extra.connect.push(origin(u));
+  const style = ["'self'", ...(fonts ? [fonts] : []), ...extra.style, ...(extra.inlineStyles ? ["'unsafe-inline'"] : [])];
+  const font = ["'self'", ...(fonts ? ["https://fonts.gstatic.com"] : []), ...extra.font, ...(extra.font.length ? ["data:"] : [])];
+  const uniq = (a) => [...new Set(a)].join(" ");
   return [
     "default-src 'self'",
-    `script-src ${script.join(" ")}`,
-    `style-src 'self'${fonts ? ` ${fonts}` : ""}`,
-    `font-src 'self'${fonts ? " https://fonts.gstatic.com" : ""}`,
-    `img-src ${img.join(" ")}`,
-    `connect-src ${connect.join(" ")}`,
-    `frame-src ${frame.length ? frame.join(" ") : "'none'"}`,
+    `script-src ${uniq([...script, ...extra.script])}`,
+    `style-src ${uniq(style)}`,
+    `font-src ${uniq(font)}`,
+    `img-src ${uniq([...img, ...extra.img, ...(extra.img.length ? ["blob:"] : [])])}`,
+    `connect-src ${uniq([...connect, ...extra.connect])}`,
+    `media-src ${uniq(["'self'", ...extra.media])}`,
+    `frame-src ${frame.length || extra.frame.length ? uniq([...frame, ...extra.frame]) : "'none'"}`,
     `form-action ${form.join(" ")}`,
     "base-uri 'self'",
     "object-src 'none'",
@@ -134,6 +142,7 @@ function clientConfig(site) {
     ctaSlugs: site.forms.ctaSlugs,
     thankYouPath: site.forms.thankYouPath,
     contactEmail: isPlaceholder(site.contact.email) ? "" : site.contact.email,
+    integrations: integrationClientConfig(site),
   };
 }
 
